@@ -98,10 +98,3 @@ http://localhost:3000
 npm run build
 npm run start
 ```
-
-## Luu y
-
-- Mot so tinh nang phu thuoc vao backend API, dac biet la auth, cart, checkout, order va admin pages.
-- Token hien dang duoc luu phia client thong qua cookie.
-- Trong repo khong nen dua len `node_modules`, `.next`, `.npm-cache`, file log va `*.tsbuildinfo`.
-- Truoc khi push len GitHub, nen kiem tra lai `package.json` de bao dam cac dependency runtime dang duoc khai bao day du.
