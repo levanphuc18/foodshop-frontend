@@ -1,14 +1,27 @@
 import type { ProductRequest, ProductResponse, ApiResponse, PageResponse } from '@/types/product';
+import type { AdminProductQuery, ProductQuery } from '@/types/query';
 import { fetcher } from '@/lib/fetcher';
 
-interface ProductPageParams {
-  page?: number;
-  size?: number;
-  asc?: boolean;
-  categoryId?: number;
-}
+type ProductQueryInput = ProductQuery & Partial<Pick<AdminProductQuery, 'status' | 'isActive'>>;
 
-// Build FormData for ProductRequest since it contains MultipartFile
+const buildProductQuery = (params: ProductQueryInput = {}, fallbackSize: number) => {
+  const query = new URLSearchParams();
+
+  if (params.search) query.set('search', params.search);
+  if (params.categoryId != null) query.set('categoryId', String(params.categoryId));
+  if (params.status && params.status !== 'ALL') query.set('status', params.status);
+  if (typeof params.isActive === 'boolean') query.set('isActive', String(params.isActive));
+  if (typeof params.minPrice === 'number') query.set('minPrice', String(params.minPrice));
+  if (typeof params.maxPrice === 'number' && Number.isFinite(params.maxPrice)) query.set('maxPrice', String(params.maxPrice));
+
+  query.set('page', String(params.page ?? 0));
+  query.set('size', String(params.size ?? fallbackSize));
+  query.set('sortBy', params.sortBy ?? 'productId');
+  query.set('sortDir', params.sortDir ?? 'DESC');
+
+  return query.toString();
+};
+
 const buildProductFormData = (request: ProductRequest): FormData => {
   const formData = new FormData();
   formData.append('name', request.name);
@@ -34,54 +47,34 @@ const buildProductFormData = (request: ProductRequest): FormData => {
 };
 
 export const searchProducts = async (
-  keyword?: string,
-  options?: ProductPageParams
+  options: ProductQuery = {}
 ): Promise<ApiResponse<PageResponse<ProductResponse>>> => {
-  const params = new URLSearchParams();
-  if (keyword) params.append('keyword', keyword);
-  if (options?.categoryId != null) params.append('categoryId', String(options.categoryId));
-  params.append('page', String(options?.page ?? 0));
-  params.append('size', String(options?.size ?? 12));
-  params.append('asc', String(options?.asc ?? true));
-
-  return await fetcher<ApiResponse<PageResponse<ProductResponse>>>(`/products/search?${params.toString()}`, {
+  return await fetcher<ApiResponse<PageResponse<ProductResponse>>>(`/products?${buildProductQuery(options, 12)}`, {
     method: 'GET',
   });
 };
 
 export const searchProductsAdmin = async (
-  keyword?: string,
-  options?: ProductPageParams
+  options: AdminProductQuery = {}
 ): Promise<ApiResponse<PageResponse<ProductResponse>>> => {
-  const params = new URLSearchParams();
-  if (keyword) params.append('keyword', keyword);
-  if (options?.categoryId != null) params.append('categoryId', String(options.categoryId));
-  params.append('page', String(options?.page ?? 0));
-  params.append('size', String(options?.size ?? 10));
-  params.append('asc', String(options?.asc ?? true));
-
-  return await fetcher<ApiResponse<PageResponse<ProductResponse>>>(`/admin/products/search?${params.toString()}`, {
+  return await fetcher<ApiResponse<PageResponse<ProductResponse>>>(`/admin/products?${buildProductQuery(options, 10)}`, {
     method: 'GET',
+    cache: 'no-store'
   });
 };
 
-export const getAllProducts = async (): Promise<ApiResponse<ProductResponse[]>> => {
-  return await fetcher<ApiResponse<ProductResponse[]>>('/products', {
+export const getAllProducts = async (): Promise<ApiResponse<PageResponse<ProductResponse>>> => {
+  return await fetcher<ApiResponse<PageResponse<ProductResponse>>>('/products?page=0&size=200&sortBy=productId&sortDir=DESC', {
     method: 'GET',
   });
 };
 
 export const getAllProductsAdmin = async (
-  options?: ProductPageParams
+  options: AdminProductQuery = {}
 ): Promise<ApiResponse<PageResponse<ProductResponse>>> => {
-  const params = new URLSearchParams();
-  if (options?.categoryId != null) params.append('categoryId', String(options.categoryId));
-  params.append('page', String(options?.page ?? 0));
-  params.append('size', String(options?.size ?? 10));
-  params.append('asc', String(options?.asc ?? false));
-
-  return await fetcher<ApiResponse<PageResponse<ProductResponse>>>(`/admin/products?${params.toString()}`, {
+  return await fetcher<ApiResponse<PageResponse<ProductResponse>>>(`/admin/products?${buildProductQuery(options, 10)}`, {
     method: 'GET',
+    cache: 'no-store'
   });
 };
 
@@ -101,7 +94,6 @@ export const getProductByIdAdmin = async (id: number): Promise<ApiResponse<Produ
 export const createProduct = async (request: ProductRequest): Promise<ApiResponse<ProductResponse>> => {
   const formData = buildProductFormData(request);
 
-  // fetcher automatically handles FormData and doesn't force Content-Type: application/json
   return await fetcher<ApiResponse<ProductResponse>>('/admin/products', {
     method: 'POST',
     body: formData,

@@ -14,7 +14,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchCategories();
-    fetchProductPage({ page: 0, size: 4, asc: false });
+    fetchProductPage({ page: 0, size: 4, sortBy: 'productId', sortDir: 'DESC' });
   }, [fetchCategories, fetchProductPage]);
 
   const featuredProducts = products.slice(0, 4);
