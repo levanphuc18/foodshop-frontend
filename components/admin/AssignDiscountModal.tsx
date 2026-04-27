@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDiscount } from '@/hooks/useDiscount';
 import { formatPrice } from '@/lib/utils';
-import { DiscountResponse } from '@/types/discount';
 
 interface AssignDiscountModalProps {
   isOpen: boolean;
@@ -120,7 +119,7 @@ export default function AssignDiscountModal({ isOpen, onClose, onConfirm, isLoad
             Cancel
           </button>
           <button
-            onClick={() => onConfirm(selectedDiscount === 'clear' ? null : selectedDiscount ? parseInt(selectedDiscount) : undefined)}
+            onClick={() => onConfirm(selectedDiscount === 'clear' ? null : selectedDiscount ? parseInt(selectedDiscount, 10) : null)}
             disabled={isLoading || !selectedDiscount}
             className="px-8 py-2.5 rounded-xl bg-sky-600 text-white text-sm font-bold hover:bg-sky-700 transition-all shadow-lg shadow-sky-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >

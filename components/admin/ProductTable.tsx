@@ -4,10 +4,11 @@ import React from 'react';
 import Link from 'next/link';
 import { formatPrice } from '@/lib/utils';
 import { ProductResponse } from '@/types/product';
+import { CategoryResponse } from '@/types/category';
 
 interface ProductTableProps {
   products: ProductResponse[];
-  categories: any[];
+  categories: CategoryResponse[];
   onView: (product: ProductResponse) => void;
   onDelete: (id: number, name: string) => void;
 }

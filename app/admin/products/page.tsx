@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import PageHeader from '@/components/admin/PageHeader';
 import Panel from '@/components/admin/Panel';
@@ -25,6 +25,15 @@ const productStatusLabels: Record<string, string> = {
   OUT_OF_STOCK: 'Out of Stock',
 };
 
+const sortMap: Record<string, { sortBy: string; sortDir: 'ASC' | 'DESC' }> = {
+  newest: { sortBy: 'productId', sortDir: 'DESC' },
+  name: { sortBy: 'name', sortDir: 'ASC' },
+  'price-high': { sortBy: 'price', sortDir: 'DESC' },
+  'price-low': { sortBy: 'price', sortDir: 'ASC' },
+  'stock-high': { sortBy: 'quantity', sortDir: 'DESC' },
+  'stock-low': { sortBy: 'quantity', sortDir: 'ASC' },
+};
+
 export default function AdminProducts() {
   const { products, productPage, fetchAdminProductPage, deleteProduct, isLoading } = useProduct();
   const { categories, fetchCategories } = useCategory();
@@ -40,23 +49,31 @@ export default function AdminProducts() {
   const [deleteName, setDeleteName] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
 
+  const selectedSort = sortMap[sortBy] ?? sortMap.newest;
+
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchAdminProductPage({
-        keyword: searchTerm.trim() || undefined,
-        categoryId: selectedCategory ? Number(selectedCategory) : undefined,
-        page: currentPage,
-        size: 10,
-        asc: sortBy === 'name' || sortBy === 'price-low' || sortBy === 'stock-low',
-      });
-    }, 300);
+  const loadProducts = () =>
+    fetchAdminProductPage({
+      search: searchTerm.trim() || undefined,
+      categoryId: selectedCategory ? Number(selectedCategory) : undefined,
+      status: stockFilter === 'ALL' ? undefined : stockFilter,
+      isActive:
+        visibilityFilter === 'ALL'
+          ? undefined
+          : visibilityFilter === 'PUBLIC',
+      page: currentPage,
+      size: 10,
+      sortBy: selectedSort.sortBy,
+      sortDir: selectedSort.sortDir,
+    });
 
+  useEffect(() => {
+    const timer = setTimeout(loadProducts, 300);
     return () => clearTimeout(timer);
-  }, [fetchAdminProductPage, searchTerm, selectedCategory, currentPage, sortBy]);
+  }, [fetchAdminProductPage, searchTerm, selectedCategory, stockFilter, visibilityFilter, currentPage, sortBy]);
 
   useEffect(() => {
     setCurrentPage(0);
@@ -66,45 +83,21 @@ export default function AdminProducts() {
     if (!deleteId) return;
     const result = await deleteProduct(deleteId);
     if (result.success) {
-      toast.success(`Đã xóa sản phẩm ${deleteName}`);
+      toast.success(`Da xoa san pham ${deleteName}`);
       setDeleteId(null);
-      fetchAdminProductPage({
-        keyword: searchTerm.trim() || undefined,
-        categoryId: selectedCategory ? Number(selectedCategory) : undefined,
-        page: currentPage,
-        size: 10,
-        asc: sortBy === 'name' || sortBy === 'price-low' || sortBy === 'stock-low',
-      });
+      loadProducts();
     } else {
-      toast.error(result.message || 'Không thể xóa sản phẩm này');
+      toast.error(result.message || 'Khong the xoa san pham nay');
     }
   };
-
-  const filteredProducts = useMemo(() => {
-    return [...products]
-      .filter((p) => {
-        const matchesStock = stockFilter === 'ALL' || p.productStatus === stockFilter;
-        const matchesVisibility = visibilityFilter === 'ALL' || (visibilityFilter === 'PUBLIC' ? p.isActive : !p.isActive);
-        return matchesStock && matchesVisibility;
-      })
-      .sort((a, b) => {
-        if (sortBy === 'newest') return b.productId - a.productId;
-        if (sortBy === 'price-high') return b.price - a.price;
-        if (sortBy === 'price-low') return a.price - b.price;
-        if (sortBy === 'stock-high') return b.quantity - a.quantity;
-        if (sortBy === 'stock-low') return a.quantity - b.quantity;
-        if (sortBy === 'name') return a.name.localeCompare(b.name);
-        return 0;
-      });
-  }, [products, selectedCategory, stockFilter, visibilityFilter, sortBy]);
 
   const getCategoryName = (id: number) => {
     const category = categories.find((c) => c.categoryId === id);
     return category ? category.name : 'Uncategorized';
   };
 
-  const visibleCount = filteredProducts.filter((p) => p.isActive).length;
-  const hiddenCount = filteredProducts.filter((p) => !p.isActive).length;
+  const visibleCount = products.filter((p) => p.isActive).length;
+  const hiddenCount = products.filter((p) => !p.isActive).length;
 
   return (
     <div className="p-8 min-h-screen bg-slate-50 dark:bg-slate-950">
@@ -124,7 +117,7 @@ export default function AdminProducts() {
         <StatsCard icon="inventory_2" label="Total Products" value={String(productPage?.totalElements ?? products.length)} sub="Matched backend results" toneClassName="text-sky-600 bg-sky-50 dark:bg-sky-900/20" />
         <StatsCard icon="check_circle" label="Visible On Page" value={String(visibleCount)} sub="Current page snapshot" toneClassName="text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20" />
         <StatsCard icon="visibility_off" label="Hidden On Page" value={String(hiddenCount)} sub="Current page snapshot" toneClassName="text-amber-600 bg-amber-50 dark:bg-amber-900/20" />
-        <StatsCard icon="warning" label="Low Or Empty" value={String(filteredProducts.filter((p) => p.productStatus !== 'IN_STOCK').length)} sub="Current page snapshot" toneClassName="text-red-500 bg-red-50 dark:bg-red-900/20" />
+        <StatsCard icon="warning" label="Low Or Empty" value={String(products.filter((p) => p.productStatus !== 'IN_STOCK').length)} sub="Current page snapshot" toneClassName="text-red-500 bg-red-50 dark:bg-red-900/20" />
       </div>
 
       <Panel className="overflow-hidden">
@@ -220,14 +213,14 @@ export default function AdminProducts() {
                     </div>
                   </td>
                 </tr>
-              ) : filteredProducts.length === 0 ? (
+              ) : products.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-12 text-center text-slate-400 italic text-sm">
                     No products found matching your criteria.
                   </td>
                 </tr>
               ) : (
-                filteredProducts.map((p) => {
+                products.map((p) => {
                   const isDiscounted = p.salePrice != null && p.salePrice < p.price;
 
                   return (
@@ -318,10 +311,10 @@ export default function AdminProducts() {
 
         <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between bg-slate-50/30">
           <p className="text-[11px] text-slate-500 dark:text-slate-400 font-black uppercase tracking-widest">
-            Showing {filteredProducts.length === 0 ? 0 : (productPage?.currentPage ?? 0) * (productPage?.pageSize ?? filteredProducts.length) + 1}
+            Showing {products.length === 0 ? 0 : (productPage?.currentPage ?? 0) * (productPage?.pageSize ?? products.length) + 1}
             -
-            {filteredProducts.length === 0 ? 0 : (productPage?.currentPage ?? 0) * (productPage?.pageSize ?? filteredProducts.length) + filteredProducts.length}
-            {' '}of {productPage?.totalElements ?? filteredProducts.length} products
+            {products.length === 0 ? 0 : (productPage?.currentPage ?? 0) * (productPage?.pageSize ?? products.length) + products.length}
+            {' '}of {productPage?.totalElements ?? products.length} products
           </p>
           <div className="flex items-center gap-2">
             <button
