@@ -33,13 +33,13 @@ export default function AdminDiscountsPage() {
       const selectedSort = sortMap[sortBy] ?? sortMap.newest;
 
       fetchDiscountPage({
-        keyword: searchTerm.trim() || undefined,
+        search: searchTerm.trim() || undefined,
         status: statusFilter,
         type: typeFilter,
         page: currentPage,
         size: 10,
         sortBy: selectedSort.sortBy,
-        asc: selectedSort.asc,
+        sortDir: selectedSort.asc ? 'ASC' : 'DESC',
       });
     }, 300);
 

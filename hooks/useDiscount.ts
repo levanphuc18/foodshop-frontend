@@ -2,34 +2,25 @@
 
 import { useState, useCallback, useRef } from 'react';
 import {
-  getAllDiscountsAdmin,
   getDiscountByIdAdmin,
   getDiscountPage,
   createDiscount,
   updateDiscount,
   deleteDiscount,
-  toggleDiscountStatus
+  toggleDiscountStatus,
 } from '@/lib/api/discount';
+import { getErrorMessage } from '@/lib/error';
 import type { PageResponse } from '@/types/api';
+import type { AdminDiscountQuery } from '@/types/query';
 import { DiscountResponse, DiscountRequest } from '@/types/discount';
 import { toast } from 'react-hot-toast';
-
-interface DiscountPageOptions {
-  keyword?: string;
-  status?: string;
-  type?: string;
-  page?: number;
-  size?: number;
-  sortBy?: string;
-  asc?: boolean;
-}
 
 export function useDiscount() {
   const [discounts, setDiscounts] = useState<DiscountResponse[]>([]);
   const [discountPage, setDiscountPage] = useState<PageResponse<DiscountResponse> | null>(null);
   const [currentDiscount, setCurrentDiscount] = useState<DiscountResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const lastPageOptionsRef = useRef<DiscountPageOptions | null>(null);
+  const lastPageOptionsRef = useRef<AdminDiscountQuery | null>(null);
 
   const applyPageData = (pageData: PageResponse<DiscountResponse>) => {
     setDiscounts(pageData.content);
@@ -37,21 +28,10 @@ export function useDiscount() {
   };
 
   const fetchDiscounts = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const response = await getAllDiscountsAdmin();
-      if (response.code === 0) {
-        setDiscounts(response.data);
-        setDiscountPage(null);
-      }
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to fetch discounts');
-    } finally {
-      setIsLoading(false);
-    }
+    await fetchDiscountPage({ page: 0, size: 100, sortBy: 'startDate', sortDir: 'DESC' });
   }, []);
 
-  const fetchDiscountPage = useCallback(async (options: DiscountPageOptions = {}) => {
+  const fetchDiscountPage = useCallback(async (options: AdminDiscountQuery = {}) => {
     setIsLoading(true);
     lastPageOptionsRef.current = options;
 
@@ -60,8 +40,8 @@ export function useDiscount() {
       if (response.code === 0) {
         applyPageData(response.data);
       }
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to fetch discounts');
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, 'Failed to fetch discounts'));
     } finally {
       setIsLoading(false);
     }
@@ -74,8 +54,8 @@ export function useDiscount() {
       if (response.code === 0) {
         setCurrentDiscount(response.data);
       }
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to fetch discount details');
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, 'Failed to fetch discount details'));
     } finally {
       setIsLoading(false);
     }
@@ -89,8 +69,8 @@ export function useDiscount() {
         toast.success('Discount created successfully');
         return response.data;
       }
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to create discount');
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, 'Failed to create discount'));
     } finally {
       setIsLoading(false);
     }
@@ -104,8 +84,8 @@ export function useDiscount() {
         toast.success('Discount updated successfully');
         return response.data;
       }
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to update discount');
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, 'Failed to update discount'));
     } finally {
       setIsLoading(false);
     }
@@ -119,14 +99,14 @@ export function useDiscount() {
         if (lastPageOptionsRef.current) {
           await fetchDiscountPage(lastPageOptionsRef.current);
         } else {
-          setDiscounts(prev => prev.filter(d => d.discountId !== id));
+          setDiscounts((prev) => prev.filter((d) => d.discountId !== id));
         }
         toast.success('Discount deleted successfully');
         return true;
       }
       return false;
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to delete discount');
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, 'Failed to delete discount'));
       return false;
     } finally {
       setIsLoading(false);
@@ -140,14 +120,14 @@ export function useDiscount() {
         if (lastPageOptionsRef.current) {
           await fetchDiscountPage(lastPageOptionsRef.current);
         } else {
-          setDiscounts(prev =>
-            prev.map(d => d.discountId === id ? response.data : d)
+          setDiscounts((prev) =>
+            prev.map((d) => (d.discountId === id ? response.data : d))
           );
         }
         toast.success(response.message || 'Status updated');
       }
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to update status');
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, 'Failed to update status'));
     }
   };
 
@@ -162,6 +142,6 @@ export function useDiscount() {
     handleCreate,
     handleUpdate,
     handleDelete,
-    toggleStatus
+    toggleStatus,
   };
 }

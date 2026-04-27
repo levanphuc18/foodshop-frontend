@@ -1,16 +1,7 @@
 import { fetcher } from '../fetcher';
 import type { ApiResponse, PageResponse } from '@/types/api';
+import type { AdminDiscountQuery } from '@/types/query';
 import { CouponValidationResponse, DiscountResponse, DiscountRequest } from '@/types/discount';
-
-interface AdminDiscountPageParams {
-  keyword?: string;
-  status?: string;
-  type?: string;
-  page?: number;
-  size?: number;
-  sortBy?: string;
-  asc?: boolean;
-}
 
 export const getAllDiscountsAdmin = async (): Promise<ApiResponse<DiscountResponse[]>> => {
   return await fetcher<ApiResponse<DiscountResponse[]>>('/admin/discounts', {
@@ -19,17 +10,17 @@ export const getAllDiscountsAdmin = async (): Promise<ApiResponse<DiscountRespon
   });
 };
 
-export const getDiscountPage = async (params: AdminDiscountPageParams = {}): Promise<ApiResponse<PageResponse<DiscountResponse>>> => {
+export const getDiscountPage = async (params: AdminDiscountQuery = {}): Promise<ApiResponse<PageResponse<DiscountResponse>>> => {
   const query = new URLSearchParams();
 
-  if (params.keyword) query.set('keyword', params.keyword);
+  if (params.search) query.set('search', params.search);
   if (params.status && params.status !== 'ALL') query.set('status', params.status);
   if (params.type && params.type !== 'ALL') query.set('type', params.type);
 
   query.set('page', String(params.page ?? 0));
   query.set('size', String(params.size ?? 10));
   query.set('sortBy', params.sortBy ?? 'startDate');
-  query.set('asc', String(params.asc ?? false));
+  query.set('sortDir', params.sortDir ?? 'DESC');
 
   return await fetcher<ApiResponse<PageResponse<DiscountResponse>>>(`/admin/discounts?${query.toString()}`, {
     method: 'GET',
