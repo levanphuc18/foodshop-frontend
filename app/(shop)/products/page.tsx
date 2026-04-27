@@ -18,6 +18,13 @@ const PRICE_RANGES = [
   { label: `Over ${formatPrice(300000)}`, min: 300000, max: Infinity },
 ];
 
+const sortMap: Record<string, { sortBy: string; sortDir: 'ASC' | 'DESC' }> = {
+  featured: { sortBy: 'productId', sortDir: 'DESC' },
+  'price-asc': { sortBy: 'price', sortDir: 'ASC' },
+  'price-desc': { sortBy: 'price', sortDir: 'DESC' },
+  name: { sortBy: 'name', sortDir: 'ASC' },
+};
+
 export default function ProductsPage() {
   const { products, productPage, fetchProductPage, isLoading: productsLoading } = useProduct();
   const { categories, fetchCategories, isLoading: categoriesLoading } = useCategory();
@@ -36,44 +43,33 @@ export default function ProductsPage() {
     fetchCategories();
   }, [fetchCategories]);
 
+  const selectedSort = sortMap[sortBy] ?? sortMap.featured;
+  const selectedPriceRange = priceRange !== null ? PRICE_RANGES[priceRange] : null;
+
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchProductPage({
-        keyword: search.trim() || undefined,
+        search: search.trim() || undefined,
         categoryId: activeCategoryId ?? undefined,
+        minPrice: selectedPriceRange?.min,
+        maxPrice: selectedPriceRange && Number.isFinite(selectedPriceRange.max) ? selectedPriceRange.max : undefined,
         page: currentPage,
         size: 12,
-        asc: sortBy !== 'price-desc',
+        sortBy: selectedSort.sortBy,
+        sortDir: selectedSort.sortDir,
       });
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [fetchProductPage, search, activeCategoryId, currentPage, sortBy]);
+  }, [fetchProductPage, search, activeCategoryId, selectedPriceRange, currentPage, sortBy]);
 
   useEffect(() => {
     setCurrentPage(0);
-  }, [search, activeCategoryId, sortBy]);
+  }, [search, activeCategoryId, priceRange, sortBy]);
 
   const isLoading = productsLoading || categoriesLoading;
   const categoryMap = buildCategoryMap(categories);
-  const mappedProducts = mapProducts(products, categoryMap);
-  const selectedPriceRange = priceRange !== null ? PRICE_RANGES[priceRange] : null;
-
-  const filteredProducts = useMemo(() => {
-    return mappedProducts
-      .filter((product) => {
-        if (selectedPriceRange && (product.price < selectedPriceRange.min || product.price > selectedPriceRange.max)) {
-          return false;
-        }
-        return true;
-      })
-      .sort((a, b) => {
-        if (sortBy === 'price-asc') return a.price - b.price;
-        if (sortBy === 'price-desc') return b.price - a.price;
-        if (sortBy === 'name') return a.title.localeCompare(b.title);
-        return Number(b.inStock) - Number(a.inStock);
-      });
-  }, [mappedProducts, selectedPriceRange, sortBy]);
+  const mappedProducts = useMemo(() => mapProducts(products, categoryMap), [products, categoryMap]);
 
   const activeCategoryName = activeCategoryId ? categoryMap[activeCategoryId] : 'All Products';
   const activeFiltersCount = (activeCategoryId ? 1 : 0) + (priceRange !== null ? 1 : 0) + (search ? 1 : 0);
@@ -104,8 +100,8 @@ export default function ProductsPage() {
             </div>
 
             <div className="grid grid-cols-3 gap-3 w-full lg:w-auto lg:min-w-[420px]">
-              <StatTile label="Matched" value={String(productPage?.totalElements ?? filteredProducts.length)} />
-              <StatTile label="In Stock" value={String(filteredProducts.filter((product) => product.inStock).length)} />
+              <StatTile label="Matched" value={String(productPage?.totalElements ?? mappedProducts.length)} />
+              <StatTile label="In Stock" value={String(mappedProducts.filter((product) => product.inStock).length)} />
               <StatTile label="Categories" value={String(categories.length)} />
             </div>
           </div>
@@ -216,8 +212,8 @@ export default function ProductsPage() {
                 <div>
                   <h2 className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-400 mb-3">Quick View</h2>
                   <div className="grid grid-cols-2 gap-2">
-                    <MiniStat label="On Page" value={String(filteredProducts.length)} />
-                    <MiniStat label="Ready" value={String(filteredProducts.filter((product) => product.inStock).length)} />
+                    <MiniStat label="On Page" value={String(mappedProducts.length)} />
+                    <MiniStat label="Ready" value={String(mappedProducts.filter((product) => product.inStock).length)} />
                   </div>
                 </div>
               </div>
@@ -237,10 +233,10 @@ export default function ProductsPage() {
 
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
               <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
-                <span className="font-black text-slate-900 dark:text-white">{productPage?.totalElements ?? filteredProducts.length}</span> products matched
+                <span className="font-black text-slate-900 dark:text-white">{productPage?.totalElements ?? mappedProducts.length}</span> products matched
               </p>
               <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
-                Showing <span className="font-black text-slate-900 dark:text-white">{filteredProducts.length}</span> items on this page
+                Showing <span className="font-black text-slate-900 dark:text-white">{mappedProducts.length}</span> items on this page
               </p>
             </div>
 
@@ -248,7 +244,7 @@ export default function ProductsPage() {
               <div className="flex justify-center items-center py-24">
                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-sky-500 border-t-transparent" />
               </div>
-            ) : filteredProducts.length === 0 ? (
+            ) : mappedProducts.length === 0 ? (
               <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-16 flex flex-col items-center text-center">
                 <span className="material-symbols-outlined text-5xl text-slate-200 dark:text-slate-700 mb-4">search_off</span>
                 <p className="text-base font-black text-slate-900 dark:text-white mb-1">No products found</p>
@@ -259,7 +255,7 @@ export default function ProductsPage() {
               </div>
             ) : viewMode === 'grid' ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-                {filteredProducts.map((product) => (
+                {mappedProducts.map((product) => (
                   <ProductGridCard
                     key={product.id}
                     product={product}
@@ -277,7 +273,7 @@ export default function ProductsPage() {
               </div>
             ) : (
               <div className="space-y-3">
-                {filteredProducts.map((product) => (
+                {mappedProducts.map((product) => (
                   <ProductListCard
                     key={product.id}
                     product={product}
@@ -295,12 +291,12 @@ export default function ProductsPage() {
               </div>
             )}
 
-            {filteredProducts.length > 0 && productPage ? (
+            {mappedProducts.length > 0 && productPage ? (
               <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm text-slate-400 font-medium">
                   Showing {(productPage.currentPage * productPage.pageSize) + 1}
                   -
-                  {Math.min((productPage.currentPage * productPage.pageSize) + filteredProducts.length, productPage.totalElements)}
+                  {Math.min((productPage.currentPage * productPage.pageSize) + mappedProducts.length, productPage.totalElements)}
                   {' '}of {productPage.totalElements}
                 </p>
                 {productPage.totalPages > 1 ? (
