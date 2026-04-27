@@ -3,13 +3,14 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { login as loginApi, register as registerApi } from '@/lib/api/auth';
+import { getErrorMessage } from '@/lib/error';
 import { useAuthStore } from '@/store/authStore';
 import type { AuthRequest, RegisterRequest } from '@/types/auth';
 
 export function useAuth() {
   const store = useAuthStore();
   const router = useRouter();
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
@@ -22,20 +23,19 @@ export function useAuth() {
       const response = await loginApi(credentials);
       if (response.code === 0 && response.data) {
         store.setAuth(response.data);
-        
-        // Check for callbackUrl in searchParams
+
         const searchParams = new URLSearchParams(window.location.search);
         const callbackUrl = searchParams.get('callbackUrl') || '/';
-        
+
         router.push(callbackUrl);
-        router.refresh(); 
+        router.refresh();
         return true;
-      } else {
-        setErrorMsg(response.message || 'Sai thông tin đăng nhập.');
-        return false;
       }
-    } catch (error: any) {
-      setErrorMsg(error.message || 'Có lỗi xảy ra khi kết nối máy chủ.');
+
+      setErrorMsg(response.message || 'Dang nhap that bai.');
+      return false;
+    } catch (error: unknown) {
+      setErrorMsg(getErrorMessage(error, 'Co loi xay ra khi ket noi may chu.'));
       return false;
     } finally {
       setIsLoading(false);
@@ -50,15 +50,15 @@ export function useAuth() {
     try {
       const response = await registerApi(credentials);
       if (response.code === 0) {
-        setSuccessMsg('Đăng ký thành công! Đang chuyển hướng...');
+        setSuccessMsg('Dang ky thanh cong! Dang chuyen huong...');
         setTimeout(() => router.push('/login'), 2000);
         return true;
-      } else {
-        setErrorMsg(response.message || 'Đăng ký thất bại');
-        return false;
       }
-    } catch (error: any) {
-      setErrorMsg(error.message || 'Có lỗi xảy ra khi kết nối máy chủ.');
+
+      setErrorMsg(response.message || 'Dang ky that bai');
+      return false;
+    } catch (error: unknown) {
+      setErrorMsg(getErrorMessage(error, 'Co loi xay ra khi ket noi may chu.'));
       return false;
     } finally {
       setIsLoading(false);
@@ -72,6 +72,6 @@ export function useAuth() {
     successMsg,
     setErrorMsg,
     login,
-    registerUser
+    registerUser,
   };
 }

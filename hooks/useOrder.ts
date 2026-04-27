@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import * as orderApi from '@/lib/api/orders';
+import { getErrorMessage } from '@/lib/error';
 import type { OrderResponse } from '@/types/order';
 
 export function useOrder() {
@@ -19,10 +20,10 @@ export function useOrder() {
       if (response.code === 0) {
         setOrders(response.data);
       } else {
-        setErrorMsg(response.message || 'Lỗi khi tải danh sách đơn hàng');
+        setErrorMsg(response.message || 'Loi khi tai danh sach don hang');
       }
-    } catch (error: any) {
-      setErrorMsg(error.message || 'Có lỗi kết nối đến server');
+    } catch (error: unknown) {
+      setErrorMsg(getErrorMessage(error, 'Co loi ket noi den server'));
     } finally {
       setIsLoading(false);
     }
@@ -36,12 +37,12 @@ export function useOrder() {
       if (response.code === 0) {
         setCurrentOrder(response.data);
         return response.data;
-      } else {
-        setErrorMsg(response.message || 'Không tìm thấy thông tin đơn hàng');
-        return null;
       }
-    } catch (error: any) {
-      setErrorMsg(error.message || 'Có lỗi khi lấy thông tin đơn hàng');
+
+      setErrorMsg(response.message || 'Khong tim thay thong tin don hang');
+      return null;
+    } catch (error: unknown) {
+      setErrorMsg(getErrorMessage(error, 'Co loi khi lay thong tin don hang'));
       return null;
     } finally {
       setIsLoading(false);
@@ -54,6 +55,6 @@ export function useOrder() {
     orders,
     currentOrder,
     fetchMyOrders,
-    getOrderById
+    getOrderById,
   };
 }

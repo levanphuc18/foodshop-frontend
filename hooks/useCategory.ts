@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import * as categoryApi from '@/lib/api/category';
+import { getErrorMessage } from '@/lib/error';
 import { CategoryResponse } from '@/types/category';
 
 export function useCategory() {
@@ -17,10 +18,10 @@ export function useCategory() {
       if (response.code === 0) {
         setCategories(response.data);
       } else {
-        setErrorMsg(response.message || 'Lỗi khi tải danh mục');
+        setErrorMsg(response.message || 'Loi khi tai danh muc');
       }
-    } catch (error: any) {
-      setErrorMsg(error.message || 'Lỗi hệ thống');
+    } catch (error: unknown) {
+      setErrorMsg(getErrorMessage(error, 'Loi he thong'));
     } finally {
       setIsLoading(false);
     }
