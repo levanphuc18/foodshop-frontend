@@ -40,7 +40,7 @@ export default function Pageorders() {
             <div className="text-center py-12 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
               <span className="material-symbols-outlined text-4xl text-slate-300 dark:text-slate-700 mb-4">inventory_2</span>
               <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1">No orders yet</h3>
-              <p className="text-xs text-slate-500 mb-6">Looks like you haven't made your first curated selection.</p>
+              <p className="text-xs text-slate-500 mb-6">Looks like you haven&apos;t made your first curated selection.</p>
               <Link href="/products" className="px-6 py-2 bg-slate-900 dark:bg-sky-600 text-white rounded-lg text-xs font-bold transition-all shadow-md">
                 Start Shopping
               </Link>

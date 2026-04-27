@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { formatPrice } from '@/lib/utils';
@@ -197,7 +197,7 @@ export default function Pageordersdetail() {
               {shippingNote && (
                 <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Note</span>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 italic">"{shippingNote}"</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 italic">&quot;{shippingNote}&quot;</p>
                 </div>
               )}
             </div>
