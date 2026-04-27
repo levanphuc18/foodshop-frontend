@@ -1,5 +1,3 @@
-import { ApiResponse } from "./product";
-
 export interface CategoryRequest {
   name: string;
   description?: string;

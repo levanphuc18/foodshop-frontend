@@ -1,5 +1,6 @@
 import { API_BASE_URL } from '@/lib/constants';
-import { getAuthHeaders, clearAuthCookies, refreshToken } from '@/lib/api/auth';
+import { getAuthHeaders, refreshToken } from '@/lib/api/auth';
+import { useAuthStore } from '@/store/authStore';
 
 /**
  * Custom fetcher that automatically includes the auth token 
@@ -48,7 +49,7 @@ export async function fetcher<T>(
           const newAuthHeaders = getAuthHeaders() as Record<string, string>;
           headers.set('Authorization', newAuthHeaders['Authorization']);
           response = await fetch(url, { ...config, headers });
-        } catch (error) {
+        } catch {
           // Refresh failed, logout the user
           handleUnauthorized();
           throw new Error('Session expired.');
@@ -73,7 +74,6 @@ export async function fetcher<T>(
     
     // Clear Zustand store (this also calls clearAuthCookies internally)
     if (typeof window !== 'undefined') {
-      const { useAuthStore } = require('@/store/authStore');
       useAuthStore.getState().logout();
       
       const path = window.location.pathname;
@@ -90,7 +90,7 @@ export async function fetcher<T>(
   try {
     const text = await response.text();
     data = text ? JSON.parse(text) : {};
-  } catch (error) {
+  } catch {
     data = {};
   }
 
