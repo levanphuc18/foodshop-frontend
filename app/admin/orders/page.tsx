@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { formatPrice } from '@/lib/utils';
 import PageHeader from '@/components/admin/PageHeader';
 import Panel from '@/components/admin/Panel';
@@ -9,6 +9,23 @@ import { useAdminOrder } from '@/hooks/useAdminOrder';
 import { OrderResponse } from '@/types/order';
 import { format } from 'date-fns';
 import OrderDetailModal from '@/components/admin/OrderDetailModal';
+import ConfirmModal from '@/components/admin/ConfirmModal';
+
+const statusStyles: Record<string, string> = {
+  PENDING: 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400',
+  PAID: 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400',
+  CONFIRMED: 'bg-sky-50 text-sky-600 dark:bg-sky-900/20 dark:text-sky-400',
+  SHIPPED: 'bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400',
+  COMPLETED: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400',
+  CANCELLED: 'bg-red-50 text-red-500 dark:bg-red-900/20 dark:text-red-400',
+};
+
+const sortMap: Record<string, { sortBy: string; sortDir: 'ASC' | 'DESC' }> = {
+  newest: { sortBy: 'createdAt', sortDir: 'DESC' },
+  oldest: { sortBy: 'createdAt', sortDir: 'ASC' },
+  'amount-high': { sortBy: 'finalAmount', sortDir: 'DESC' },
+  'amount-low': { sortBy: 'finalAmount', sortDir: 'ASC' },
+};
 
 export default function AdminOrders() {
   const { orders, orderPage, isLoading, fetchOrderPage, updateStatus } = useAdminOrder();
@@ -17,29 +34,22 @@ export default function AdminOrders() {
   const [sortBy, setSortBy] = useState('newest');
   const [selectedOrder, setSelectedOrder] = useState<OrderResponse | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
+  const [pendingStatusChange, setPendingStatusChange] = useState<{ orderId: number; status: string } | null>(null);
+
+  const selectedSort = sortMap[sortBy] ?? sortMap.newest;
+
+  const loadOrders = () =>
+    fetchOrderPage({
+      search: searchTerm.trim() || undefined,
+      status: statusFilter,
+      page: currentPage,
+      size: 10,
+      sortBy: selectedSort.sortBy,
+      sortDir: selectedSort.sortDir,
+    });
 
   useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
-      const sortMap: Record<string, { sortBy: string; asc: boolean }> = {
-        newest: { sortBy: 'createdAt', asc: false },
-        oldest: { sortBy: 'createdAt', asc: true },
-        'amount-high': { sortBy: 'finalAmount', asc: false },
-        'amount-low': { sortBy: 'finalAmount', asc: true },
-        items: { sortBy: 'createdAt', asc: false },
-      };
-
-      const selectedSort = sortMap[sortBy] ?? sortMap.newest;
-
-      fetchOrderPage({
-        keyword: searchTerm.trim() || undefined,
-        status: statusFilter,
-        page: currentPage,
-        size: 10,
-        sortBy: selectedSort.sortBy,
-        asc: selectedSort.asc,
-      });
-    }, 300);
-
+    const timeoutId = window.setTimeout(loadOrders, 300);
     return () => window.clearTimeout(timeoutId);
   }, [searchTerm, statusFilter, sortBy, currentPage, fetchOrderPage]);
 
@@ -47,28 +57,28 @@ export default function AdminOrders() {
     setCurrentPage(0);
   }, [searchTerm, statusFilter, sortBy]);
 
-  const statusStyles: Record<string, string> = {
-    PENDING: 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400',
-    PAID: 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400',
-    CONFIRMED: 'bg-sky-50 text-sky-600 dark:bg-sky-900/20 dark:text-sky-400',
-    SHIPPED: 'bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400',
-    COMPLETED: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400',
-    CANCELLED: 'bg-red-50 text-red-500 dark:bg-red-900/20 dark:text-red-400',
-  };
-
-  const displayedOrders = useMemo(() => {
-    if (sortBy !== 'items') {
-      return orders;
-    }
-
-    return [...orders].sort((a, b) => b.orderItems.length - a.orderItems.length);
-  }, [orders, sortBy]);
-
-  const totalRevenue = displayedOrders
-    .filter(o => o.status === 'COMPLETED' || o.status === 'PAID' || o.status === 'SHIPPED')
+  const totalRevenue = orders
+    .filter((o) => o.status === 'COMPLETED' || o.status === 'PAID' || o.status === 'SHIPPED')
     .reduce((sum, o) => sum + o.finalAmount, 0);
 
-  const pendingOrders = displayedOrders.filter(o => o.status === 'PENDING').length;
+  const pendingOrders = orders.filter((o) => o.status === 'PENDING').length;
+
+  const requestStatusChange = (orderId: number, status: string) => {
+    if (status === 'CANCELLED' || status === 'COMPLETED') {
+      setPendingStatusChange({ orderId, status });
+      return;
+    }
+
+    void updateStatus(orderId, status);
+  };
+
+  const confirmStatusChange = async () => {
+    if (!pendingStatusChange) return;
+    const success = await updateStatus(pendingStatusChange.orderId, pendingStatusChange.status);
+    if (success) {
+      setPendingStatusChange(null);
+    }
+  };
 
   return (
     <div className="p-8 min-h-screen bg-slate-50 dark:bg-slate-950">
@@ -78,16 +88,7 @@ export default function AdminOrders() {
         description="Monitor and process your global artisanal seafood distribution."
         action={
           <button
-            onClick={() =>
-              fetchOrderPage({
-                keyword: searchTerm.trim() || undefined,
-                status: statusFilter,
-                page: currentPage,
-                size: 10,
-                sortBy: sortBy === 'amount-high' || sortBy === 'amount-low' ? 'finalAmount' : 'createdAt',
-                asc: sortBy === 'oldest' || sortBy === 'amount-low',
-              })
-            }
+            onClick={loadOrders}
             type="button"
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-sm font-bold hover:bg-slate-50 transition-all shadow-sm shrink-0"
           >
@@ -100,7 +101,7 @@ export default function AdminOrders() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
         <StatsCard icon="payments" label="Visible Revenue" value={formatPrice(totalRevenue)} sub="Current page snapshot" trendUp />
         <StatsCard icon="local_shipping" label="Pending On Page" value={`${pendingOrders} Orders`} sub="Awaiting processing" />
-        <StatsCard icon="public" label="Total Orders" value={`${orderPage?.totalElements ?? displayedOrders.length}`} sub="Matched backend results" toneClassName="text-purple-600 bg-purple-50 dark:bg-purple-900/20 dark:text-purple-400" />
+        <StatsCard icon="public" label="Total Orders" value={`${orderPage?.totalElements ?? orders.length}`} sub="Matched backend results" toneClassName="text-purple-600 bg-purple-50 dark:bg-purple-900/20 dark:text-purple-400" />
       </div>
 
       <Panel className="overflow-hidden">
@@ -111,10 +112,7 @@ export default function AdminOrders() {
               Order History
             </h2>
             <div className="flex flex-wrap gap-2 w-full lg:w-auto">
-              <form
-                className="relative flex-1 min-w-[200px] lg:w-64"
-                onSubmit={(e) => e.preventDefault()}
-              >
+              <form className="relative flex-1 min-w-[200px] lg:w-64" onSubmit={(e) => e.preventDefault()}>
                 <button
                   type="submit"
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-sky-600 transition-all z-10 p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700"
@@ -136,8 +134,8 @@ export default function AdminOrders() {
                 className="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-[11px] font-black uppercase text-slate-600 dark:text-slate-200 focus:outline-none"
               >
                 <option value="ALL">All Status</option>
-                {Object.keys(statusStyles).map(s => (
-                  <option key={s} value={s}>{s}</option>
+                {Object.keys(statusStyles).map((status) => (
+                  <option key={status} value={status}>{status}</option>
                 ))}
               </select>
 
@@ -150,7 +148,6 @@ export default function AdminOrders() {
                 <option value="oldest">Sort: Oldest First</option>
                 <option value="amount-high">Amount: High to Low</option>
                 <option value="amount-low">Amount: Low to High</option>
-                <option value="items">Sort: Items Count</option>
               </select>
             </div>
           </div>
@@ -170,14 +167,14 @@ export default function AdminOrders() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-              {displayedOrders.length === 0 ? (
+              {orders.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-12 text-center text-slate-500 text-sm">
                     No orders found matching your criteria.
                   </td>
                 </tr>
               ) : (
-                displayedOrders.map((o) => (
+                orders.map((o) => (
                   <tr key={o.orderId} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/30 transition-colors">
                     <td className="px-6 py-4">
                       <div className="text-sm font-bold text-sky-600 dark:text-sky-400">#{o.orderId}</div>
@@ -214,11 +211,11 @@ export default function AdminOrders() {
                       <select
                         disabled={isLoading}
                         value={o.status}
-                        onChange={(e) => updateStatus(o.orderId, e.target.value)}
+                        onChange={(e) => requestStatusChange(o.orderId, e.target.value)}
                         className="text-[10px] font-black uppercase tracking-wider bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-sky-500/20 outline-none transition-all cursor-pointer"
                       >
-                        {Object.keys(statusStyles).map(s => (
-                          <option key={s} value={s}>{s}</option>
+                        {Object.keys(statusStyles).map((status) => (
+                          <option key={status} value={status}>{status}</option>
                         ))}
                       </select>
                     </td>
@@ -231,10 +228,10 @@ export default function AdminOrders() {
 
         <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between bg-slate-50/30">
           <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">
-            Showing {displayedOrders.length === 0 ? 0 : (orderPage?.currentPage ?? 0) * (orderPage?.pageSize ?? displayedOrders.length) + 1}
+            Showing {orders.length === 0 ? 0 : (orderPage?.currentPage ?? 0) * (orderPage?.pageSize ?? orders.length) + 1}
             -
-            {displayedOrders.length === 0 ? 0 : (orderPage?.currentPage ?? 0) * (orderPage?.pageSize ?? displayedOrders.length) + displayedOrders.length}
-            {' '}of {orderPage?.totalElements ?? displayedOrders.length} orders
+            {orders.length === 0 ? 0 : (orderPage?.currentPage ?? 0) * (orderPage?.pageSize ?? orders.length) + orders.length}
+            {' '}of {orderPage?.totalElements ?? orders.length} orders
           </p>
           <div className="flex items-center gap-2">
             <button
@@ -260,9 +257,19 @@ export default function AdminOrders() {
         </div>
       </Panel>
 
-      <OrderDetailModal
-        order={selectedOrder}
-        onClose={() => setSelectedOrder(null)}
+      <OrderDetailModal order={selectedOrder} onClose={() => setSelectedOrder(null)} />
+      <ConfirmModal
+        isOpen={pendingStatusChange !== null}
+        title="Confirm Status Change"
+        message={
+          pendingStatusChange
+            ? `Are you sure you want to move order #${pendingStatusChange.orderId} to ${pendingStatusChange.status}?`
+            : ''
+        }
+        confirmLabel="Confirm"
+        onConfirm={confirmStatusChange}
+        onCancel={() => setPendingStatusChange(null)}
+        isLoading={isLoading}
       />
     </div>
   );

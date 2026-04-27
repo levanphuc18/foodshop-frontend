@@ -1,15 +1,7 @@
 import type { OrderRequest, OrderResponse } from '@/types/order';
 import type { ApiResponse, PageResponse } from '@/types/api';
+import type { AdminOrderQuery } from '@/types/query';
 import { fetcher } from '@/lib/fetcher';
-
-interface AdminOrderPageParams {
-  keyword?: string;
-  status?: string;
-  page?: number;
-  size?: number;
-  sortBy?: string;
-  asc?: boolean;
-}
 
 export const createOrder = async (request: OrderRequest): Promise<ApiResponse<OrderResponse>> => {
   return await fetcher<ApiResponse<OrderResponse>>('/orders', {
@@ -39,16 +31,16 @@ export const getAllOrders = async (): Promise<ApiResponse<OrderResponse[]>> => {
   });
 };
 
-export const getOrderPage = async (params: AdminOrderPageParams = {}): Promise<ApiResponse<PageResponse<OrderResponse>>> => {
+export const getOrderPage = async (params: AdminOrderQuery = {}): Promise<ApiResponse<PageResponse<OrderResponse>>> => {
   const query = new URLSearchParams();
 
-  if (params.keyword) query.set('keyword', params.keyword);
+  if (params.search) query.set('search', params.search);
   if (params.status && params.status !== 'ALL') query.set('status', params.status);
 
   query.set('page', String(params.page ?? 0));
   query.set('size', String(params.size ?? 10));
   query.set('sortBy', params.sortBy ?? 'createdAt');
-  query.set('asc', String(params.asc ?? false));
+  query.set('sortDir', params.sortDir ?? 'DESC');
 
   return await fetcher<ApiResponse<PageResponse<OrderResponse>>>(`/admin/orders?${query.toString()}`, {
     method: 'GET',

@@ -2,25 +2,18 @@
 
 import { useState, useCallback, useRef } from 'react';
 import * as orderApi from '@/lib/api/orders';
+import { getErrorMessage } from '@/lib/error';
 import type { PageResponse } from '@/types/api';
+import type { AdminOrderQuery } from '@/types/query';
 import type { OrderResponse } from '@/types/order';
 import { toast } from 'react-hot-toast';
-
-interface AdminOrderPageOptions {
-  keyword?: string;
-  status?: string;
-  page?: number;
-  size?: number;
-  sortBy?: string;
-  asc?: boolean;
-}
 
 export function useAdminOrder() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [orders, setOrders] = useState<OrderResponse[]>([]);
   const [orderPage, setOrderPage] = useState<PageResponse<OrderResponse> | null>(null);
-  const lastPageOptionsRef = useRef<AdminOrderPageOptions | null>(null);
+  const lastPageOptionsRef = useRef<AdminOrderQuery | null>(null);
 
   const applyPageData = (pageData: PageResponse<OrderResponse>) => {
     setOrders(Array.isArray(pageData?.content) ? pageData.content : []);
@@ -28,25 +21,10 @@ export function useAdminOrder() {
   };
 
   const fetchAllOrders = useCallback(async () => {
-    setIsLoading(true);
-    setErrorMsg('');
-    try {
-      const response = await orderApi.getAllOrders();
-      if (response.code === 0) {
-        const dataArray = Array.isArray(response.data) ? response.data : (response.data?.content || []);
-        setOrders(dataArray);
-        setOrderPage(null);
-      } else {
-        setErrorMsg(response.message || 'Lỗi khi tải danh sách đơn hàng');
-      }
-    } catch (error: any) {
-      setErrorMsg(error.message || 'Có lỗi kết nối đến server');
-    } finally {
-      setIsLoading(false);
-    }
+    await fetchOrderPage({ page: 0, size: 100, sortBy: 'createdAt', sortDir: 'DESC' });
   }, []);
 
-  const fetchOrderPage = useCallback(async (options: AdminOrderPageOptions = {}) => {
+  const fetchOrderPage = useCallback(async (options: AdminOrderQuery = {}) => {
     setIsLoading(true);
     setErrorMsg('');
     lastPageOptionsRef.current = options;
@@ -56,10 +34,10 @@ export function useAdminOrder() {
       if (response.code === 0) {
         applyPageData(response.data);
       } else {
-        setErrorMsg(response.message || 'Lỗi khi tải danh sách đơn hàng');
+        setErrorMsg(response.message || 'Loi khi tai danh sach don hang');
       }
-    } catch (error: any) {
-      setErrorMsg(error.message || 'Có lỗi kết nối đến server');
+    } catch (error: unknown) {
+      setErrorMsg(getErrorMessage(error, 'Co loi ket noi den server'));
     } finally {
       setIsLoading(false);
     }
@@ -70,19 +48,19 @@ export function useAdminOrder() {
     try {
       const response = await orderApi.updateOrderStatus(id, status);
       if (response.code === 0) {
-        toast.success(`Cập nhật trạng thái đơn hàng #${id} thành công`);
+        toast.success(`Cap nhat trang thai don hang #${id} thanh cong`);
         if (lastPageOptionsRef.current) {
           await fetchOrderPage(lastPageOptionsRef.current);
         } else {
           await fetchAllOrders();
         }
         return true;
-      } else {
-        toast.error(response.message || 'Lỗi khi cập nhật trạng thái');
-        return false;
       }
-    } catch (error: any) {
-      toast.error(error.message || 'Có lỗi xảy ra');
+
+      toast.error(response.message || 'Loi khi cap nhat trang thai');
+      return false;
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, 'Co loi xay ra'));
       return false;
     } finally {
       setIsLoading(false);
@@ -96,6 +74,6 @@ export function useAdminOrder() {
     orderPage,
     fetchAllOrders,
     fetchOrderPage,
-    updateStatus
+    updateStatus,
   };
 }
