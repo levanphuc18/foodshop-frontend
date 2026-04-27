@@ -2,26 +2,18 @@
 
 import { useState, useCallback, useRef } from 'react';
 import * as userApi from '@/lib/api/user';
+import { getErrorMessage } from '@/lib/error';
 import type { PageResponse } from '@/types/api';
+import type { AdminUserQuery } from '@/types/query';
 import { UserResponse } from '@/types/user';
 import { toast } from 'react-hot-toast';
-
-interface UserPageOptions {
-  keyword?: string;
-  role?: string;
-  enabled?: boolean;
-  page?: number;
-  size?: number;
-  sortBy?: string;
-  asc?: boolean;
-}
 
 export function useUser() {
   const [users, setUsers] = useState<UserResponse[]>([]);
   const [userPage, setUserPage] = useState<PageResponse<UserResponse> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const lastPageOptionsRef = useRef<UserPageOptions | null>(null);
+  const lastPageOptionsRef = useRef<AdminUserQuery | null>(null);
 
   const applyPageData = (pageData: PageResponse<UserResponse>) => {
     setUsers(pageData.content);
@@ -29,25 +21,10 @@ export function useUser() {
   };
 
   const fetchUsers = useCallback(async () => {
-    setIsLoading(true);
-    setErrorMsg(null);
-    try {
-      const response = await userApi.getAllUsers();
-      if (response.code === 0) {
-        const dataArray = Array.isArray(response.data) ? response.data : (response.data?.content || []);
-        setUsers(dataArray);
-        setUserPage(null);
-      } else {
-        setErrorMsg(response.message || 'Lỗi khi tải danh sách người dùng');
-      }
-    } catch (error: any) {
-      setErrorMsg(error.message || 'Lỗi hệ thống khi tải người dùng');
-    } finally {
-      setIsLoading(false);
-    }
+    await fetchUserPage({ page: 0, size: 100, sortBy: 'createdAt', sortDir: 'DESC' });
   }, []);
 
-  const fetchUserPage = useCallback(async (options: UserPageOptions = {}) => {
+  const fetchUserPage = useCallback(async (options: AdminUserQuery = {}) => {
     setIsLoading(true);
     setErrorMsg(null);
     lastPageOptionsRef.current = options;
@@ -57,10 +34,10 @@ export function useUser() {
       if (response.code === 0) {
         applyPageData(response.data);
       } else {
-        setErrorMsg(response.message || 'Lỗi khi tải danh sách người dùng');
+        setErrorMsg(response.message || 'Loi khi tai danh sach nguoi dung');
       }
-    } catch (error: any) {
-      setErrorMsg(error.message || 'Lỗi hệ thống khi tải người dùng');
+    } catch (error: unknown) {
+      setErrorMsg(getErrorMessage(error, 'Loi he thong khi tai nguoi dung'));
     } finally {
       setIsLoading(false);
     }
@@ -81,14 +58,14 @@ export function useUser() {
               }
             : current
         );
-        toast.success(response.message || 'Cập nhật trạng thái thành công');
+        toast.success(response.message || 'Cap nhat trang thai thanh cong');
         return true;
-      } else {
-        toast.error(response.message || 'Không thể cập nhật trạng thái');
-        return false;
       }
-    } catch (error: any) {
-      toast.error(error.message || 'Lỗi hệ thống khi cập nhật trạng thái');
+
+      toast.error(response.message || 'Khong the cap nhat trang thai');
+      return false;
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, 'Loi he thong khi cap nhat trang thai'));
       return false;
     }
   };

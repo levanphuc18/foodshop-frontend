@@ -28,13 +28,13 @@ export default function AdminCustomers() {
       const selectedSort = sortMap[sortBy] ?? sortMap.newest;
 
       fetchUserPage({
-        keyword: searchTerm.trim() || undefined,
+        search: searchTerm.trim() || undefined,
         role,
         enabled,
         page: currentPage,
         size: 10,
         sortBy: selectedSort.sortBy,
-        asc: selectedSort.asc,
+        sortDir: selectedSort.asc ? 'ASC' : 'DESC',
       });
     }, 300);
 
