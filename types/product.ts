@@ -9,6 +9,12 @@ export interface ProductRequest {
   isActive?: boolean;
 }
 
+export interface BulkAssignDiscountRequest {
+  productIds: number[];
+  discountId: number | null;
+  replaceExisting?: boolean;
+}
+
 export interface ProductResponse {
   productId: number;
   name: string;

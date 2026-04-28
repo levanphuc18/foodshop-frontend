@@ -1,4 +1,4 @@
-import type { ProductRequest, ProductResponse, ApiResponse, PageResponse } from '@/types/product';
+import type { ProductRequest, ProductResponse, ApiResponse, PageResponse, BulkAssignDiscountRequest } from '@/types/product';
 import type { AdminProductQuery, ProductQuery } from '@/types/query';
 import { fetcher } from '@/lib/fetcher';
 
@@ -112,6 +112,13 @@ export const updateProduct = async (id: number, request: ProductRequest): Promis
 export const deleteProduct = async (id: number): Promise<ApiResponse<void>> => {
   return await fetcher<ApiResponse<void>>(`/admin/products/${id}`, {
     method: 'DELETE',
+  });
+};
+
+export const bulkAssignDiscount = async (request: BulkAssignDiscountRequest): Promise<ApiResponse<void>> => {
+  return await fetcher<ApiResponse<void>>('/admin/products/assign-discount', {
+    method: 'POST',
+    body: JSON.stringify(request),
   });
 };
 

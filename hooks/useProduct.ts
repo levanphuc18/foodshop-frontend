@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import * as productApi from '@/lib/api/product';
 import { getErrorMessage } from '@/lib/error';
-import type { PageResponse, ProductRequest, ProductResponse } from '@/types/product';
+import type { BulkAssignDiscountRequest, PageResponse, ProductRequest, ProductResponse } from '@/types/product';
 import type { AdminProductQuery, ProductQuery } from '@/types/query';
 
 export function useProduct() {
@@ -265,6 +265,28 @@ export function useProduct() {
     }
   };
 
+  const bulkAssignDiscount = async (request: BulkAssignDiscountRequest) => {
+    setIsLoading(true);
+    clearMessages();
+    try {
+      const response = await productApi.bulkAssignDiscount(request);
+      if (response.code === 0) {
+        setSuccessMsg(response.message || 'Gan ma giam gia thanh cong!');
+        return { success: true, message: response.message };
+      }
+
+      const msg = response.message || 'Gan ma giam gia that bai';
+      setErrorMsg(msg);
+      return { success: false, message: msg };
+    } catch (error: unknown) {
+      const msg = getErrorMessage(error, 'Loi gan ma giam gia cho san pham');
+      setErrorMsg(msg);
+      return { success: false, message: msg };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
     isLoading,
     errorMsg,
@@ -287,5 +309,6 @@ export function useProduct() {
     createProduct,
     updateProduct,
     deleteProduct,
+    bulkAssignDiscount,
   };
 }
