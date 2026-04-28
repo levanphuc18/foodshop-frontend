@@ -12,6 +12,10 @@ interface OrderDetailModalProps {
 export default function OrderDetailModal({ order, onClose }: OrderDetailModalProps) {
   if (!order) return null;
 
+  const customerPrimaryLabel = order.fullName || order.username || `User #${order.userId}`;
+  const customerSecondaryLabel =
+    order.fullName && order.username ? `@${order.username}` : `User #${order.userId}`;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
       <div className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in duration-200">
@@ -29,8 +33,15 @@ export default function OrderDetailModal({ order, onClose }: OrderDetailModalPro
         </div>
         
         <div className="p-6 max-h-[70vh] overflow-y-auto">
-          {/* Shipping & Payment Summary */}
+          {/* Customer / Shipping / Payment Summary */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+            <div>
+              <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Customer Information</h4>
+              <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/40">
+                <p className="text-sm font-semibold text-slate-900 dark:text-white">{customerPrimaryLabel}</p>
+                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{customerSecondaryLabel}</p>
+              </div>
+            </div>
             <div>
               <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Shipping Information</h4>
               <p className="text-sm font-semibold text-slate-900 dark:text-white">{order.shippingAddress}</p>
@@ -40,7 +51,7 @@ export default function OrderDetailModal({ order, onClose }: OrderDetailModalPro
                 </div>
               )}
             </div>
-            <div>
+            <div className="sm:col-span-2">
               <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Payment Summary</h4>
               <div className="space-y-1">
                 <div className="flex justify-between text-xs">

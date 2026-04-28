@@ -80,6 +80,11 @@ export default function AdminOrders() {
     }
   };
 
+  const getCustomerPrimaryLabel = (order: OrderResponse) => order.fullName || order.username || `User #${order.userId}`;
+
+  const getCustomerSecondaryLabel = (order: OrderResponse) =>
+    order.fullName && order.username ? `@${order.username}` : `User #${order.userId}`;
+
   return (
     <div className="p-8 min-h-screen bg-slate-50 dark:bg-slate-950">
       <PageHeader
@@ -158,6 +163,7 @@ export default function AdminOrders() {
             <thead>
               <tr className="bg-slate-50 dark:bg-slate-800/50">
                 <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Order ID</th>
+                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Customer</th>
                 <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Items</th>
                 <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Shipping To</th>
                 <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Amount</th>
@@ -169,7 +175,7 @@ export default function AdminOrders() {
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {orders.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-slate-500 text-sm">
+                  <td colSpan={8} className="px-6 py-12 text-center text-slate-500 text-sm">
                     No orders found matching your criteria.
                   </td>
                 </tr>
@@ -179,6 +185,14 @@ export default function AdminOrders() {
                     <td className="px-6 py-4">
                       <div className="text-sm font-bold text-sky-600 dark:text-sky-400">#{o.orderId}</div>
                       <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">{format(new Date(o.createdAt), 'MMM dd, yyyy')}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm font-semibold text-slate-900 dark:text-white">
+                        {getCustomerPrimaryLabel(o)}
+                      </div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400">
+                        {getCustomerSecondaryLabel(o)}
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-sm font-semibold text-slate-900 dark:text-white">
