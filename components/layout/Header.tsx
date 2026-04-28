@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useCart } from '@/hooks/useCart';
 import { useAuthStore } from '@/store/authStore';
 import { useEffect, useState } from 'react';
+import NotificationBell from '@/components/layout/NotificationBell';
 
 import { useRouter } from 'next/navigation';
 
@@ -49,6 +50,8 @@ export default function Header() {
               </span>
             )}
           </div>
+
+          {isAuthenticated && user?.role === 'CUSTOMER' && <NotificationBell />}
 
           {isAuthenticated ? (
             <div className="flex items-center gap-3 pl-2 border-l border-slate-200 dark:border-slate-800">

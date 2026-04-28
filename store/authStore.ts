@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import type { AuthResponse } from '@/types/auth';
 import { clearAuthCookies } from '@/lib/api/auth';
 import { useCartStore } from './cartStore';
+import { useNotificationStore } from './notificationStore';
 
 interface AuthState {
   user: { username: string; userId: number; role: 'ADMIN' | 'CUSTOMER' } | null;
@@ -24,6 +25,7 @@ export const useAuthStore = create<AuthState>()(
         clearAuthCookies();
         // Clear cart store state immediately
         useCartStore.getState().clearCart();
+        useNotificationStore.getState().clear();
         set({ user: null, isAuthenticated: false });
       },
     }),
