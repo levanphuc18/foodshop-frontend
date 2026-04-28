@@ -159,16 +159,7 @@ export default function AdminDiscountsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center">
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full animate-spin"></div>
-                      <p className="text-sm font-medium text-slate-400">Fetching offers...</p>
-                    </div>
-                  </td>
-                </tr>
-              ) : discounts.length === 0 ? (
+              {discounts.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-slate-400 italic text-sm">
                     No discount codes found.
