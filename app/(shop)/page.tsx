@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 export default function Home() {
@@ -97,7 +96,7 @@ export default function Home() {
   );
 }
 
-function CategoryCard({ title, tag, img }: any) {
+function CategoryCard({ title, tag, img }: { title: string; tag: string; img: string }) {
   return (
     <div className="relative overflow-hidden bg-slate-50 dark:bg-slate-900 rounded-[2.5rem] group cursor-pointer shadow-xl shadow-slate-900/5">
       <img className="absolute inset-0 w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-110 opacity-80" src={img} alt={title} />

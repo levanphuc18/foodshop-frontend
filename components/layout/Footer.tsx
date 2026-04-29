@@ -10,7 +10,7 @@ export default function Footer() {
               <span className="text-sky-500">Dry</span>Sea
             </Link>
             <p className="text-slate-400 text-sm leading-relaxed max-w-sm">
-              Artisanal seafood preservation, rooted in coastal heritage and sustainable practices. Delivering the ocean's finest to your table.
+              Artisanal seafood preservation, rooted in coastal heritage and sustainable practices. Delivering the ocean&apos;s finest to your table.
             </p>
             <div className="flex space-x-4">
                {/* Social placeholders could go here */}

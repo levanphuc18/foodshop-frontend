@@ -46,7 +46,23 @@ export default function Pageordersdetail() {
     );
   }
 
-  const { status, createdAt, orderItems, shippingAddress, shippingNote, totalAmount, discountAmount, finalAmount, discountCode } = currentOrder;
+  const {
+    status,
+    createdAt,
+    orderItems,
+    shippingAddress,
+    shippingNote,
+    totalAmount,
+    discountAmount,
+    shippingFee,
+    shippingDiscount,
+    finalAmount,
+    discountCode,
+    discountCodes,
+  } = currentOrder;
+  const appliedCodes = discountCodes && discountCodes.length > 0 ? discountCodes : (discountCode ? discountCode.split(',').map(code => code.trim()).filter(Boolean) : []);
+  const totalSavings = discountAmount + shippingDiscount;
+  const originalTotal = totalAmount + shippingFee;
 
   const STATUS_STEPS = ['PENDING', 'CONFIRMED', 'SHIPPED', 'COMPLETED'];
   const currentIndex = STATUS_STEPS.indexOf(status);
@@ -151,6 +167,7 @@ export default function Pageordersdetail() {
                     key={item.orderItemId}
                     title={item.productName}
                     price={formatPrice(item.price)}
+                    originalPrice={item.originalPrice > item.price ? formatPrice(item.originalPrice) : undefined}
                     subtotal={formatPrice(item.subtotal)}
                     qty={item.quantity.toString()}
                     img={item.productImageUrl || 'https://via.placeholder.com/150'}
@@ -171,14 +188,44 @@ export default function Pageordersdetail() {
                 </div>
                 {discountAmount > 0 && (
                   <div className="flex justify-between items-center">
-                    <span className="text-[10px] uppercase font-bold text-sky-400 tracking-widest">Discount ({discountCode || 'VOUCHER'})</span>
+                    <span className="text-[10px] uppercase font-bold text-sky-400 tracking-widest">Order discount</span>
                     <span className="text-sm font-bold text-sky-400">-{formatPrice(discountAmount)}</span>
                   </div>
                 )}
                 <div className="flex justify-between items-center">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Logistics</span>
-                  <span className="text-sm font-bold text-slate-500 italic">Included</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Shipping fee</span>
+                  <span className="text-sm font-bold">{formatPrice(shippingFee)}</span>
                 </div>
+                {shippingDiscount > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-widest">Shipping discount</span>
+                    <span className="text-sm font-bold text-emerald-400">-{formatPrice(shippingDiscount)}</span>
+                  </div>
+                )}
+                {appliedCodes.length > 0 && (
+                  <div className="pt-2">
+                    <span className="text-[10px] uppercase font-bold text-slate-500 tracking-widest block mb-2">Applied codes</span>
+                    <div className="flex flex-wrap gap-2">
+                      {appliedCodes.map((code) => (
+                        <span key={code} className="px-2.5 py-1 rounded-lg bg-slate-800 text-[10px] font-black uppercase tracking-widest text-sky-300 border border-slate-700">
+                          {code}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {totalSavings > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] uppercase font-bold text-slate-500 tracking-widest">Original total</span>
+                    <span className="text-sm font-bold text-slate-400 line-through">{formatPrice(originalTotal)}</span>
+                  </div>
+                )}
+                {totalSavings > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-widest">Total saved</span>
+                    <span className="text-sm font-bold text-emerald-400">{formatPrice(totalSavings)}</span>
+                  </div>
+                )}
               </div>
               <div className="pt-6 border-t border-white/10 flex flex-col">
                 <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Total Settled</span>
@@ -219,7 +266,7 @@ export default function Pageordersdetail() {
   );
 }
 
-function OrderDetailItem({ title, price, subtotal, qty, img }: { title: string; price: string; subtotal: string; qty: string; img: string }) {
+function OrderDetailItem({ title, price, originalPrice, subtotal, qty, img }: { title: string; price: string; originalPrice?: string; subtotal: string; qty: string; img: string }) {
   return (
     <div className="p-6 flex items-center gap-6 group hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-all">
       <div className="w-20 h-20 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shrink-0 shadow-sm">
@@ -227,7 +274,11 @@ function OrderDetailItem({ title, price, subtotal, qty, img }: { title: string; 
       </div>
       <div className="flex-1 min-w-0">
         <h3 className="text-sm font-black text-slate-900 dark:text-white truncate">{title}</h3>
-        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Price: {price}</p>
+        <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-widest">
+          <span className="text-slate-400">Price:</span>
+          {originalPrice ? <span className="text-slate-400 line-through">{originalPrice}</span> : null}
+          <span className="text-sky-500">{price}</span>
+        </div>
         <div className="mt-3 flex justify-between items-center">
           <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Qty: <span className="text-slate-900 dark:text-white">{qty}</span></span>
           <span className="text-sm font-black text-sky-600 italic">{subtotal}</span>

@@ -14,7 +14,7 @@ export default function Pagenotfound() {
         
         <h2 className="text-6xl md:text-8xl font-black text-slate-950 dark:text-white tracking-tighter mb-8 leading-none">Charted Territory <br /> Ends Here.</h2>
         <p className="text-slate-500 text-xl font-medium max-w-2xl mx-auto mb-16 leading-relaxed">
-          The artisanal curation you're searching for has either been reclaimed by the tides or never left the harbor.
+          The artisanal curation you&apos;re searching for has either been reclaimed by the tides or never left the harbor.
         </p>
         
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
@@ -42,7 +42,7 @@ export default function Pagenotfound() {
   );
 }
 
-function SuggestionCard({ icon, title, desc, href }: any) {
+function SuggestionCard({ icon, title, desc, href }: { icon: string; title: string; desc: string; href: string }) {
   return (
     <Link href={href} className="group p-10 bg-slate-50 dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 hover:border-sky-500 transition-all">
       <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center mb-8 shadow-lg group-hover:bg-sky-600 group-hover:text-white transition-all">

@@ -52,6 +52,8 @@ export default function Pageorders() {
               const titleSummary = order.orderItems.length > 0
                 ? `${order.orderItems[0].productName} ${order.orderItems.length > 1 ? `& ${order.orderItems.length - 1} other item(s)` : ''}`
                 : 'Empty Order';
+              const originalTotal = order.totalAmount + order.shippingFee;
+              const totalSavings = order.discountAmount + order.shippingDiscount;
 
               return (
                 <OrderCard
@@ -60,6 +62,8 @@ export default function Pageorders() {
                   date={date}
                   status={order.status}
                   price={formatPrice(order.finalAmount)}
+                  originalPrice={totalSavings > 0 ? formatPrice(originalTotal) : undefined}
+                  savings={totalSavings > 0 ? formatPrice(totalSavings) : undefined}
                   title={titleSummary}
                   img={firstItemImg}
                   active={['PENDING', 'CONFIRMED', 'SHIPPED'].includes(order.status)}
@@ -74,7 +78,29 @@ export default function Pageorders() {
   );
 }
 
-function OrderCard({ id, date, status, price, title, img, active = false, images = [] }: { id: string; date: string; status: string; price: string; title: string; img: string; active?: boolean, images?: string[] }) {
+function OrderCard({
+  id,
+  date,
+  status,
+  price,
+  originalPrice,
+  savings,
+  title,
+  img,
+  active = false,
+  images = [],
+}: {
+  id: string;
+  date: string;
+  status: string;
+  price: string;
+  originalPrice?: string;
+  savings?: string;
+  title: string;
+  img: string;
+  active?: boolean;
+  images?: string[];
+}) {
   const isPending = status !== 'COMPLETED' && status !== 'CANCELLED';
 
   const statusColors: Record<string, string> = {
@@ -107,6 +133,12 @@ function OrderCard({ id, date, status, price, title, img, active = false, images
             </div>
             <div className="text-right shrink-0 ml-4">
               <p className="text-lg font-black text-slate-900 dark:text-white">{price}</p>
+              {originalPrice ? (
+                <p className="mt-1 text-xs font-bold text-slate-400 line-through">{originalPrice}</p>
+              ) : null}
+              {savings ? (
+                <p className="mt-1 text-[10px] font-black uppercase tracking-widest text-emerald-500">Saved {savings}</p>
+              ) : null}
               <div className="flex items-center justify-end gap-1.5 mt-1">
                 <div className={`w-1.5 h-1.5 rounded-full ${dotColor} ${isPending ? 'animate-pulse' : ''}`} />
                 <span className={`text-[10px] font-bold uppercase tracking-widest ${textColor}`}>{status}</span>
