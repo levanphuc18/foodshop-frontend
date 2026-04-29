@@ -42,57 +42,6 @@ export function useProduct() {
     }
   }, []);
 
-  const fetchProductsAdmin = useCallback(async () => {
-    setIsLoading(true);
-    clearMessages();
-    try {
-      const response = await productApi.getAllProductsAdmin();
-      if (response.code === 0) {
-        applyPageData(response.data);
-      } else {
-        setErrorMsg(response.message || 'Loi khi tai danh sach san pham (Admin)');
-      }
-    } catch (error: unknown) {
-      setErrorMsg(getErrorMessage(error, 'Loi khi tai danh sach san pham (Admin)'));
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const searchProducts = useCallback(async (search?: string) => {
-    setIsLoading(true);
-    clearMessages();
-    try {
-      const response = await productApi.searchProducts({ search });
-      if (response.code === 0) {
-        applyPageData(response.data);
-      } else {
-        setErrorMsg(response.message || 'Loi khi tim kiem san pham');
-      }
-    } catch (error: unknown) {
-      setErrorMsg(getErrorMessage(error, 'Loi khi tim kiem san pham'));
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const searchProductsAdmin = useCallback(async (search?: string) => {
-    setIsLoading(true);
-    clearMessages();
-    try {
-      const response = await productApi.searchProductsAdmin({ search });
-      if (response.code === 0) {
-        applyPageData(response.data);
-      } else {
-        setErrorMsg(response.message || 'Loi khi tim kiem san pham (Admin)');
-      }
-    } catch (error: unknown) {
-      setErrorMsg(getErrorMessage(error, 'Loi khi tim kiem san pham (Admin)'));
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
   const fetchProductPage = useCallback(async (options: ProductQuery = {}) => {
     setIsLoading(true);
     clearMessages();
@@ -163,40 +112,6 @@ export function useProduct() {
     } catch (error: unknown) {
       setErrorMsg(getErrorMessage(error, 'Loi lay thong tin san pham (Admin)'));
       return null;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const getProductsByCategory = useCallback(async (categoryId: number) => {
-    setIsLoading(true);
-    clearMessages();
-    try {
-      const response = await productApi.getProductsByCategory(categoryId);
-      if (response.code === 0) {
-        setProducts(response.data);
-      } else {
-        setErrorMsg(response.message || 'Loi khi tai danh sach san pham theo danh muc');
-      }
-    } catch (error: unknown) {
-      setErrorMsg(getErrorMessage(error, 'Loi he thong'));
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const getProductsByCategoryAdmin = useCallback(async (categoryId: number) => {
-    setIsLoading(true);
-    clearMessages();
-    try {
-      const response = await productApi.getProductsByCategoryAdmin(categoryId);
-      if (response.code === 0) {
-        setProducts(response.data);
-      } else {
-        setErrorMsg(response.message || 'Loi khi tai danh sach san pham theo danh muc (Admin)');
-      }
-    } catch (error: unknown) {
-      setErrorMsg(getErrorMessage(error, 'Loi he thong'));
     } finally {
       setIsLoading(false);
     }
@@ -297,15 +212,10 @@ export function useProduct() {
     currentProduct,
     productPage,
     fetchProducts,
-    fetchProductsAdmin,
     fetchProductPage,
     fetchAdminProductPage,
-    searchProducts,
-    searchProductsAdmin,
     getProductById,
     getProductByIdAdmin,
-    getProductsByCategory,
-    getProductsByCategoryAdmin,
     createProduct,
     updateProduct,
     deleteProduct,

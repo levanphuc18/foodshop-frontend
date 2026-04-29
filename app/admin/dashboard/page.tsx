@@ -13,14 +13,14 @@ import Link from 'next/link';
 
 export default function AdminDashboard() {
   const { orders, fetchAllOrders } = useAdminOrder();
-  const { products, fetchProductsAdmin } = useProduct();
+  const { products, fetchAdminProductPage } = useProduct();
   const { users, fetchUsers } = useUser();
 
   useEffect(() => {
     fetchAllOrders();
-    fetchProductsAdmin();
+    fetchAdminProductPage();
     fetchUsers();
-  }, [fetchAllOrders, fetchProductsAdmin, fetchUsers]);
+  }, [fetchAllOrders, fetchAdminProductPage, fetchUsers]);
 
   // Calculations
   const totalRevenue = useMemo(() => 
