@@ -15,6 +15,8 @@ export default function OrderDetailModal({ order, onClose }: OrderDetailModalPro
   const customerPrimaryLabel = order.fullName || order.username || `User #${order.userId}`;
   const customerSecondaryLabel =
     order.fullName && order.username ? `@${order.username}` : `User #${order.userId}`;
+  const originalTotal = order.totalAmount + order.shippingFee;
+  const totalSavings = order.discountAmount + order.shippingDiscount;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
@@ -74,10 +76,22 @@ export default function OrderDetailModal({ order, onClose }: OrderDetailModalPro
                     <span className="font-semibold text-rose-500">-{formatPrice(order.shippingDiscount)}</span>
                   </div>
                 )}
+                {totalSavings > 0 && (
+                  <div className="flex justify-between text-xs">
+                    <span className="text-slate-400">Original Total:</span>
+                    <span className="font-semibold text-slate-400 line-through">{formatPrice(originalTotal)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm pt-2 border-t border-slate-100 dark:border-slate-800">
                   <span className="font-bold text-slate-900 dark:text-white">Total:</span>
                   <span className="font-bold text-sky-600 dark:text-sky-400">{formatPrice(order.finalAmount)}</span>
                 </div>
+                {totalSavings > 0 && (
+                  <div className="flex justify-between text-xs">
+                    <span className="text-emerald-500 font-semibold">Total Saved:</span>
+                    <span className="font-semibold text-emerald-500">{formatPrice(totalSavings)}</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -96,7 +110,12 @@ export default function OrderDetailModal({ order, onClose }: OrderDetailModalPro
                 </div>
                 <div className="flex-1 min-w-0">
                   <h5 className="text-sm font-bold text-slate-900 dark:text-white truncate">{item.productName}</h5>
-                  <p className="text-[11px] text-slate-400">{formatPrice(item.price)} x {item.quantity}</p>
+                  <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px]">
+                    {item.originalPrice > item.price ? (
+                      <span className="text-slate-400 line-through">{formatPrice(item.originalPrice)}</span>
+                    ) : null}
+                    <span className="text-slate-500">{formatPrice(item.price)} x {item.quantity}</span>
+                  </div>
                 </div>
                 <div className="text-sm font-bold text-slate-900 dark:text-white">
                   {formatPrice(item.subtotal)}
