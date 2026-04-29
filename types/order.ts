@@ -4,6 +4,7 @@ export interface OrderRequest {
   shippingAddress: string;
   shippingNote?: string;
   discountCode?: string;
+  discountCodes?: string[];
 }
 
 export interface OrderItemResponse {
@@ -12,6 +13,7 @@ export interface OrderItemResponse {
   productName: string;
   productImageUrl: string | null;
   price: number;
+  originalPrice: number;
   quantity: number;
   subtotal: number;
 }
@@ -28,6 +30,7 @@ export interface OrderResponse {
   shippingDiscount: number;
   finalAmount: number;
   discountCode: string | null;
+  discountCodes?: string[];
   userId: number;
   username?: string | null;
   fullName?: string | null;

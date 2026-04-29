@@ -6,6 +6,9 @@ export interface DiscountResponse {
   value: number;
   minOrderAmount?: number;
   maxDiscount?: number;
+  usageLimit?: number | null;
+  usedCount: number;
+  perUserLimit?: number | null;
   startDate: string;
   endDate: string;
   status: 'ACTIVE' | 'EXPIRED' | 'DISABLED';
@@ -18,19 +21,19 @@ export interface DiscountRequest {
   value: number;
   minOrderAmount?: number;
   maxDiscount?: number;
+  usageLimit?: number;
+  perUserLimit?: number;
   startDate: string;
   endDate: string;
   status: 'ACTIVE' | 'EXPIRED' | 'DISABLED';
 }
 
-/** Response từ API validate coupon (để preview trước khi đặt hàng) */
 export interface CouponValidationResponse {
   valid: boolean;
   code: string;
   type?: 'ORDER' | 'SHIPPING';
   discountUnit?: 'PERCENT' | 'AMOUNT';
   value?: number;
-  /** Số tiền thực tế được giảm (đã tính theo đơn hàng) */
   discountAmount?: number;
   minOrderAmount?: number;
   maxDiscount?: number;
