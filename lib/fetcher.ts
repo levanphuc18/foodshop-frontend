@@ -26,38 +26,29 @@ export async function fetcher<T>(
     headers.set('Authorization', authHeaders['Authorization']);
   }
 
+  // SECURITY FIX [P0]: Đảm bảo cookie (HttpOnly) được gửi đi kèm request
   const config: RequestInit = {
     ...options,
     headers,
+    credentials: 'include', 
   };
 
   let response = await fetch(url, config);
 
   // Intercept 401 Unauthorized or 403 Forbidden
   if (response.status === 401 || response.status === 403) {
-    if (typeof document !== 'undefined') {
-      const cookies = document.cookie.split(';');
-      const refreshCookie = cookies.find(c => c.trim().startsWith('refresh-token='));
+    if (typeof window !== 'undefined') {
+      try {
+        // SECURITY FIX: Client không thể đọc refresh-token.
+        // Hãy gọi endpoint POST /api/auth/refresh (Next.js proxy route) 
+        // để proxy này tự lấy HttpOnly cookie cũ, gọi sang Java BE, và set HttpOnly cookie mới.
+        await fetch('/api/auth/refresh', { method: 'POST' });
 
-      if (refreshCookie) {
-        const token = refreshCookie.split('=')[1];
-        try {
-          // Attempt to refresh the token
-          await refreshToken(token);
-
-          // Retry the original request with the new token
-          const newAuthHeaders = getAuthHeaders() as Record<string, string>;
-          headers.set('Authorization', newAuthHeaders['Authorization']);
-          response = await fetch(url, { ...config, headers });
-        } catch {
-          // Refresh failed, logout the user
-          handleUnauthorized();
-          throw new Error('Session expired.');
-        }
-      } else {
-        // No refresh token available, logout
+        // Retry the original request
+        response = await fetch(url, config);
+      } catch {
         handleUnauthorized();
-        throw new Error('Unauthorized.');
+        throw new Error('Session expired.');
       }
     } else {
       throw new Error('Unauthorized');
@@ -66,10 +57,6 @@ export async function fetcher<T>(
 
   function handleUnauthorized() {
     if (isRedirecting) return;
-    
-    const currentToken = document.cookie.split(';').find(c => c.trim().startsWith('auth-token='));
-    if (!currentToken) return;
-
     isRedirecting = true;
     
     // Clear Zustand store (this also calls clearAuthCookies internally)

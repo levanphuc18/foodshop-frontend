@@ -6,32 +6,34 @@ import type { ApiResponse } from '@/types/api';
  * Tiện ích đơn giản để lưu token vào cookies ở phía client.
  * (Để chuẩn nhất với Next.js SSR/Middleware, nên dùng Next.js Server Actions hoặc thư viện 'cookies-next')
  */
-export const setAuthCookies = (accessToken: string, refreshToken: string) => {
-  if (typeof document !== 'undefined') {
-    // Thời hạn cookie theo cấu hình backend (mặc định set tạm 7 ngày)
-    document.cookie = `auth-token=${accessToken}; path=/; max-age=86400; SameSite=Lax`;
-    document.cookie = `refresh-token=${refreshToken}; path=/; max-age=604800; SameSite=Lax`;
+export const setAuthCookies = async (accessToken: string, refreshToken: string) => {
+  // SECURITY FIX [P0]: Dùng HttpOnly cookie thông qua internal API Route thay vì document.cookie (chống XSS)
+  if (typeof window !== 'undefined') {
+    await fetch('/api/auth/cookies', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ accessToken, refreshToken }),
+    });
   }
 };
 
-export const clearAuthCookies = () => {
-  if (typeof document !== 'undefined') {
+export const clearAuthCookies = async () => {
+  // SECURITY FIX [P0]: Clear cookie thông qua internal API Route
+  if (typeof window !== 'undefined') {
+    try {
+      await fetch('/api/auth/cookies', { method: 'DELETE' });
+    } catch (e) {
+      console.warn('Failed to clear HttpOnly cookies via API');
+    }
+    // Dọn dẹp cả token cũ còn sót lại (legacy non-HttpOnly)
     document.cookie = 'auth-token=; path=/; max-age=0';
     document.cookie = 'refresh-token=; path=/; max-age=0';
   }
 };
 
 export const getAuthHeaders = (): HeadersInit => {
-  if (typeof document !== 'undefined') {
-    const cookies = document.cookie.split(';');
-    const tokenCookie = cookies.find(c => c.trim().startsWith('auth-token='));
-    if (tokenCookie) {
-      const token = tokenCookie.split('=')[1];
-      return {
-        'Authorization': `Bearer ${token}`,
-      };
-    }
-  }
+  // SECURITY FIX [P0]: Token giờ là HttpOnly, Client JS không thể đọc được.
+  // API requests cần sử dụng credentials: 'include' hoặc thông qua Next.js Proxy.
   return {};
 };
 
