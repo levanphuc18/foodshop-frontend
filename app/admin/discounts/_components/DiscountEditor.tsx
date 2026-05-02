@@ -261,25 +261,34 @@ export default function DiscountEditor({ mode, id }: DiscountEditorProps) {
                     <DisabledField label="Maximum Discount Cap" text="Only used for PERCENT discounts." />
                   )}
 
-                  <NumericField
-                    label="Usage Limit"
-                    name="usageLimit"
-                    value={formData.usageLimit}
-                    onChange={handleChange}
-                    min={0}
-                    step="1"
-                    placeholder="Leave empty for unlimited"
-                  />
+                  {/* BUG FIX: type=PRODUCT không dùng Usage Limit và Per-user Limit */}
+                  {formData.type === 'PRODUCT' ? (
+                    <DisabledField label="Usage Limit" text="Not applicable for PRODUCT discounts." />
+                  ) : (
+                    <NumericField
+                      label="Usage Limit"
+                      name="usageLimit"
+                      value={formData.usageLimit}
+                      onChange={handleChange}
+                      min={0}
+                      step="1"
+                      placeholder="Leave empty for unlimited"
+                    />
+                  )}
 
-                  <NumericField
-                    label="Per-user Limit"
-                    name="perUserLimit"
-                    value={formData.perUserLimit}
-                    onChange={handleChange}
-                    min={0}
-                    step="1"
-                    placeholder="Leave empty for unlimited"
-                  />
+                  {formData.type === 'PRODUCT' ? (
+                    <DisabledField label="Per-user Limit" text="Not applicable for PRODUCT discounts." />
+                  ) : (
+                    <NumericField
+                      label="Per-user Limit"
+                      name="perUserLimit"
+                      value={formData.perUserLimit}
+                      onChange={handleChange}
+                      min={0}
+                      step="1"
+                      placeholder="Leave empty for unlimited"
+                    />
+                  )}
 
                   <div className="space-y-2">
                     <label className="text-xs font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Start Date</label>

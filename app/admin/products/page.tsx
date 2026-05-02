@@ -333,22 +333,36 @@ export default function AdminProducts() {
                         <div className="text-[11px] text-slate-400 font-medium">{productStatusLabels[p.productStatus]}</div>
                       </td>
                       <td className="px-6 py-4">
-                        {p.discountId != null ? (
-                          <div className="space-y-1">
-                            <div className="inline-flex items-center rounded-full bg-sky-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-sky-700 dark:bg-sky-900/30 dark:text-sky-300">
-                              Discount #{p.discountId}
-                            </div>
-                            <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                              {p.discountUnit === 'PERCENT' && p.discountPercentage != null
-                                ? `${p.discountPercentage}% off`
-                                : p.salePrice != null
-                                  ? `${formatPrice(p.price - p.salePrice)} off`
-                                  : 'Product discount'}
-                            </div>
-                          </div>
-                        ) : (
-                          <span className="text-sm text-slate-400 dark:text-slate-500">None</span>
-                        )}
+                        {/* BUG FIX: Ẩn discount đã hết hạn – kiểm tra discountEndDate trước khi hiển thị */}
+                        {(() => {
+                          const isExpiredDiscount = p.discountEndDate
+                            ? (() => {
+                                const now = new Date();
+                                now.setHours(0, 0, 0, 0);
+                                const end = new Date(p.discountEndDate);
+                                end.setHours(0, 0, 0, 0);
+                                return end < now;
+                              })()
+                            : false;
+
+                          if (p.discountId != null && !isExpiredDiscount) {
+                            return (
+                              <div className="space-y-1">
+                                <div className="inline-flex items-center rounded-full bg-sky-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-sky-700 dark:bg-sky-900/30 dark:text-sky-300">
+                                  Discount #{p.discountId}
+                                </div>
+                                <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                                  {p.discountUnit === 'PERCENT' && p.discountPercentage != null
+                                    ? `${p.discountPercentage}% off`
+                                    : p.salePrice != null
+                                      ? `${formatPrice(p.price - p.salePrice)} off`
+                                      : 'Product discount'}
+                                </div>
+                              </div>
+                            );
+                          }
+                          return <span className="text-sm text-slate-400 dark:text-slate-500">None</span>;
+                        })()}
                       </td>
                       <td className="px-6 py-4 text-center">
                         <div className="flex justify-center">

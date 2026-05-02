@@ -29,6 +29,8 @@ export interface ProductResponse {
   quantity: number;
   imageUrls: string[] | null;
   discountId: number | null;
+  /** ISO date string (yyyy-MM-dd) – ngày kết thúc của product discount đang gắn, null nếu không có */
+  discountEndDate?: string | null;
   categoryId: number;
   maxDiscount?: number | null;
   productStatus: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK';

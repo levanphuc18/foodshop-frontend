@@ -58,9 +58,20 @@ export default function AdminDiscountsPage() {
     }
   };
 
-  const activeCount = discounts.filter(d => d.status === 'ACTIVE').length;
-  const expiredCount = discounts.filter(d => d.status === 'EXPIRED').length;
-  const disabledCount = discounts.filter(d => d.status === 'DISABLED').length;
+  // BUG FIX: Discount đã qua endDate không được có status=ACTIVE.
+  // resolveStatus: nếu endDate đã qua thì luôn hiển thị EXPIRED, bỏ qua status từ server.
+  const resolveStatus = (discount: { status: string; endDate: string }) => {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const end = new Date(discount.endDate);
+    end.setHours(0, 0, 0, 0);
+    if (end < now) return 'EXPIRED';
+    return discount.status;
+  };
+
+  const activeCount = discounts.filter(d => resolveStatus(d) === 'ACTIVE').length;
+  const expiredCount = discounts.filter(d => resolveStatus(d) === 'EXPIRED').length;
+  const disabledCount = discounts.filter(d => resolveStatus(d) === 'DISABLED').length;
 
   return (
     <div className="p-8 min-h-screen bg-slate-50 dark:bg-slate-950">
@@ -209,17 +220,30 @@ export default function AdminDiscountsPage() {
                     </td>
                     <td className="px-6 py-4 text-center">
                       <div className="flex justify-center">
-                        <StatusBadge status={discount.status} />
+                        {/* BUG FIX: Tính toán status hiển thị tại client để tránh hiển thị ACTIVE cho discount hết hạn */}
+                        <StatusBadge status={resolveStatus(discount)} />
                       </div>
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {/* BUG FIX: Không cho phép toggle discount đã expired */}
                         <button
                           onClick={() => toggleStatus(discount.discountId)}
-                          title={discount.status === 'DISABLED' ? 'Enable' : 'Disable'}
-                          className={`p-2 rounded-xl transition-all ${discount.status === 'DISABLED' ? 'text-emerald-600 hover:bg-emerald-50' : 'text-rose-600 hover:bg-rose-50'}`}
+                          title={
+                            resolveStatus(discount) === 'EXPIRED'
+                              ? 'Expired – cannot change status'
+                              : resolveStatus(discount) === 'DISABLED' ? 'Enable' : 'Disable'
+                          }
+                          disabled={resolveStatus(discount) === 'EXPIRED'}
+                          className={`p-2 rounded-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
+                            resolveStatus(discount) === 'DISABLED'
+                              ? 'text-emerald-600 hover:bg-emerald-50'
+                              : 'text-rose-600 hover:bg-rose-50'
+                          }`}
                         >
-                          <span className="material-symbols-outlined text-lg">{discount.status === 'DISABLED' ? 'check_circle' : 'block'}</span>
+                          <span className="material-symbols-outlined text-lg">
+                            {resolveStatus(discount) === 'DISABLED' ? 'check_circle' : 'block'}
+                          </span>
                         </button>
                         <Link
                           href={`/admin/discounts/${discount.discountId}`}

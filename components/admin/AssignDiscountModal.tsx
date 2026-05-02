@@ -71,9 +71,17 @@ export default function AssignDiscountModal({
 
   const productDiscounts = useMemo(() => {
     const keyword = searchTerm.trim().toLowerCase();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
     return discounts
-      .filter((discount) => discount.type === 'PRODUCT' && discount.status === 'ACTIVE')
+      .filter((discount) => {
+        if (discount.type !== 'PRODUCT' || discount.status !== 'ACTIVE') return false;
+        // BUG FIX: Loại bỏ các discount đã hết hạn ngay cả khi backend vẫn trả về status=ACTIVE
+        const end = new Date(discount.endDate);
+        end.setHours(0, 0, 0, 0);
+        return end >= today;
+      })
       .filter((discount) => {
         if (!keyword) {
           return true;
