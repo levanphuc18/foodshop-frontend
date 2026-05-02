@@ -81,3 +81,15 @@ export async function refreshToken(token: string): Promise<ApiResponse<JwtRespon
   }
   return result;
 }
+
+export async function fetchCurrentUser(): Promise<ApiResponse<AuthResponse>> {
+  const res = await fetch(`${API_BASE_URL}/auth/me`, {
+    method: 'GET',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+  const result: ApiResponse<AuthResponse> = await res.json();
+  if (!res.ok) throw new Error(result.message || 'Fetch current user failed');
+  return result;
+}

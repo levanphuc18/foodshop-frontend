@@ -9,6 +9,7 @@ import AuthField from '@/components/auth/AuthField';
 import AuthMessage from '@/components/auth/AuthMessage';
 import AuthDivider from '@/components/auth/AuthDivider';
 import GoogleAuthButton from '@/components/auth/GoogleAuthButton';
+import { API_ORIGIN } from '@/lib/constants';
 
 export default function Pagelogin() {
   const { login, isLoading, errorMsg } = useAuth();
@@ -61,7 +62,15 @@ export default function Pagelogin() {
 
         <div className="mt-6">
           <AuthDivider label="Or continue with" />
-          <GoogleAuthButton onClick={() => alert('Google Login coming soon!')} label="Google" />
+          <GoogleAuthButton
+            onClick={() => {
+              const searchParams = new URLSearchParams(window.location.search);
+              const callbackUrl = searchParams.get('callbackUrl') || '/';
+              sessionStorage.setItem('oauth_callback_url', callbackUrl);
+              window.location.href = `${API_ORIGIN}/oauth2/authorization/google`;
+            }}
+            label="Google"
+          />
         </div>
 
         <div className="mt-8 pt-8 border-t border-slate-100 dark:border-slate-800 text-center">
