@@ -21,9 +21,6 @@ export default function ProfileSidebar({ active }: ProfileSidebarProps) {
   const links = [
     { href: '/profile', icon: 'account_circle', label: 'Account Details', key: 'profile' },
     { href: '/orders', icon: 'package_2', label: 'Order History', key: 'orders' },
-    { href: '/wishlist', icon: 'favorite', label: 'Saved Items', key: 'wishlist' },
-    { href: '/address', icon: 'local_shipping', label: 'Addresses', key: 'address' },
-    { href: '/payment', icon: 'credit_card', label: 'Payment Methods', key: 'payment' },
   ];
 
   return (

@@ -6,9 +6,6 @@ const AUTH_PATHS = ['/login', '/register'];
 const PROTECTED_PATHS = [
   '/profile',
   '/orders',
-  '/wishlist',
-  '/address',
-  '/payment',
   '/checkout'
 ];
 
