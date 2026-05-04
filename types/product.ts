@@ -35,6 +35,8 @@ export interface ProductResponse {
   maxDiscount?: number | null;
   productStatus: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK';
   isActive: boolean;
+  averageRating: number;
+  totalReviews: number;
 }
 
 export interface PageResponse<T> {
