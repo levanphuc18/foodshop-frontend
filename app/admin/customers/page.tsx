@@ -5,7 +5,7 @@ import PageHeader from '@/components/admin/PageHeader';
 import Panel from '@/components/admin/Panel';
 import StatsCard from '@/components/admin/StatsCard';
 import { useUser } from '@/hooks/useUser';
-import { format } from 'date-fns';
+import { formatPrice, formatDate } from '@/lib/utils';
 
 export default function AdminCustomers() {
   const { users, userPage, isLoading, fetchUserPage, toggleStatus } = useUser();
@@ -61,15 +61,15 @@ export default function AdminCustomers() {
   return (
     <div className="p-8 min-h-screen bg-slate-50 dark:bg-slate-950">
       <PageHeader
-        eyebrow="CRM"
-        title="Customer Insights"
-        description="Manage and analyze your artisanal seafood enthusiasts."
+        eyebrow="Quản lý"
+        title="Khách hàng"
+        description="Quản lý và phân tích khách hàng của bạn."
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
-        <StatsCard icon="group" label="Total Customers" value={(userPage?.totalElements ?? users.length).toString()} sub="Matched backend results" trendUp toneClassName="text-sky-600 bg-sky-50 dark:bg-sky-900/20" />
-        <StatsCard icon="loyalty" label="Active On Page" value={activeCount.toString()} sub="Current page snapshot" toneClassName="text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 dark:text-emerald-400" />
-        <StatsCard icon="block" label="Disabled On Page" value={disabledCount.toString()} sub="Current page snapshot" toneClassName="text-amber-600 bg-amber-50 dark:bg-amber-900/20 dark:text-amber-400" />
+        <StatsCard icon="group" label="Tổng khách hàng" value={(userPage?.totalElements ?? users.length).toString()} sub="Kết quả từ hệ thống" trendUp toneClassName="text-sky-600 bg-sky-50 dark:bg-sky-900/20" />
+        <StatsCard icon="loyalty" label="Đang hoạt động" value={activeCount.toString()} sub="Trang hiện tại" toneClassName="text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 dark:text-emerald-400" />
+        <StatsCard icon="block" label="Đã khóa" value={disabledCount.toString()} sub="Trang hiện tại" toneClassName="text-amber-600 bg-amber-50 dark:bg-amber-900/20 dark:text-amber-400" />
       </div>
 
       <Panel className="overflow-hidden">
@@ -77,7 +77,7 @@ export default function AdminCustomers() {
           <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
             <h2 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-sky-500"></span>
-              All Curators
+              Tất cả khách hàng
             </h2>
             <div className="flex flex-wrap gap-2 w-full lg:w-auto">
               <form
@@ -92,7 +92,7 @@ export default function AdminCustomers() {
                 </button>
                 <input
                   type="text"
-                  placeholder="Search name, email, username..."
+                  placeholder="Tìm tên, email, tài khoản..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20"
@@ -104,9 +104,9 @@ export default function AdminCustomers() {
                 onChange={(e) => setRoleFilter(e.target.value)}
                 className="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-[11px] font-black uppercase text-slate-600 dark:text-slate-200 focus:outline-none"
               >
-                <option value="ALL">All Roles</option>
-                <option value="CUSTOMER">Customers</option>
-                <option value="ADMIN">Administrators</option>
+                <option value="ALL">Tất cả vai trò</option>
+                <option value="CUSTOMER">Khách hàng</option>
+                <option value="ADMIN">Quản trị viên</option>
               </select>
 
               <select
@@ -114,9 +114,9 @@ export default function AdminCustomers() {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-[11px] font-black uppercase text-slate-600 dark:text-slate-200 focus:outline-none"
               >
-                <option value="ALL">All Status</option>
-                <option value="ACTIVE">Active Only</option>
-                <option value="BLOCKED">Blocked Only</option>
+                <option value="ALL">Tất cả trạng thái</option>
+                <option value="ACTIVE">Hoạt động</option>
+                <option value="BLOCKED">Đã khóa</option>
               </select>
 
               <select
@@ -124,9 +124,9 @@ export default function AdminCustomers() {
                 onChange={(e) => setSortBy(e.target.value)}
                 className="px-3 py-2 bg-sky-50 dark:bg-sky-900/20 border border-sky-100 dark:border-sky-800/50 rounded-xl text-[11px] font-black uppercase text-sky-700 dark:text-sky-300 focus:outline-none"
               >
-                <option value="newest">Sort: Newest First</option>
-                <option value="name">Sort: Name A-Z</option>
-                <option value="username">Sort: Username</option>
+                <option value="newest">Sắp xếp: Mới nhất</option>
+                <option value="name">Sắp xếp: Tên A-Z</option>
+                <option value="username">Sắp xếp: Tài khoản</option>
               </select>
             </div>
           </div>
@@ -136,19 +136,19 @@ export default function AdminCustomers() {
           <table className="w-full text-left">
             <thead>
               <tr className="bg-slate-50 dark:bg-slate-800/50">
-                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Customer</th>
-                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Joined Date</th>
-                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Phone</th>
-                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Role</th>
-                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 text-center">Status</th>
-                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 text-right">Actions</th>
+                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Khách hàng</th>
+                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Ngày tham gia</th>
+                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">SĐT</th>
+                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Vai trò</th>
+                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 text-center">Trạng thái</th>
+                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 text-right">Thao tác</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {users.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-slate-400 italic text-sm">
-                    No matching customers found.
+                    Không tìm thấy khách hàng phù hợp.
                   </td>
                 </tr>
               ) : (
@@ -160,13 +160,13 @@ export default function AdminCustomers() {
                           {getInitials(u.fullName || u.username)}
                         </div>
                         <div>
-                          <div className="text-sm font-bold text-slate-900 dark:text-white">{u.fullName || 'No Name'}</div>
+                          <div className="text-sm font-bold text-slate-900 dark:text-white">{u.fullName || 'Chưa có tên'}</div>
                           <div className="text-[11px] text-slate-400 font-medium">@{u.username} • {u.email}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400">
-                      {u.createdAt ? format(new Date(u.createdAt), 'MMM dd, yyyy') : 'Long ago'}
+                      {u.createdAt ? formatDate(u.createdAt, 'DD/MM/YYYY') : 'Lâu rồi'}
                     </td>
                     <td className="px-6 py-4 text-xs font-bold text-slate-600 dark:text-slate-300">{u.phoneNumber || '—'}</td>
                     <td className="px-6 py-4">
@@ -182,12 +182,12 @@ export default function AdminCustomers() {
                               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                               <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
                             </span>
-                            Active
+                            Hoạt động
                           </span>
                         ) : (
                           <span className="inline-flex items-center justify-center gap-1.5 w-[85px] py-1.5 rounded-full text-[10px] font-black uppercase tracking-tight bg-amber-500/10 text-amber-600 border border-amber-500/20 shadow-sm shadow-amber-500/10">
                             <span className="material-symbols-outlined text-[14px]">block</span>
-                            Blocked
+                            Đã khóa
                           </span>
                         )}
                       </div>
@@ -203,7 +203,7 @@ export default function AdminCustomers() {
                             <span className="material-symbols-outlined text-lg">{u.enabled ? 'block' : 'check_circle'}</span>
                           </button>
                         ) : (
-                          <div className="p-2 text-[10px] font-black uppercase tracking-widest text-slate-300 italic">Protected</div>
+                          <div className="p-2 text-[10px] font-black uppercase tracking-widest text-slate-300 italic">Bảo vệ</div>
                         )}
                         <button className="p-2 rounded-xl text-slate-400 hover:text-sky-600 hover:bg-sky-50 transition-all">
                           <span className="material-symbols-outlined text-lg">analytics</span>
@@ -219,10 +219,10 @@ export default function AdminCustomers() {
 
         <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between bg-slate-50/30">
           <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">
-            Showing {users.length === 0 ? 0 : (userPage?.currentPage ?? 0) * (userPage?.pageSize ?? users.length) + 1}
+            Hiển thị {users.length === 0 ? 0 : (userPage?.currentPage ?? 0) * (userPage?.pageSize ?? users.length) + 1}
             -
             {users.length === 0 ? 0 : (userPage?.currentPage ?? 0) * (userPage?.pageSize ?? users.length) + users.length}
-            {' '}of {userPage?.totalElements ?? users.length} customers
+            {' '}/ {userPage?.totalElements ?? users.length} khách hàng
           </p>
           <div className="flex items-center gap-2">
             <button
@@ -231,10 +231,10 @@ export default function AdminCustomers() {
               disabled={userPage?.first ?? true}
               className="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 disabled:opacity-50"
             >
-              Previous
+              Trước
             </button>
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 min-w-[90px] text-center">
-              Page {(userPage?.currentPage ?? 0) + 1} / {Math.max(userPage?.totalPages ?? 1, 1)}
+              Trang {(userPage?.currentPage ?? 0) + 1} / {Math.max(userPage?.totalPages ?? 1, 1)}
             </span>
             <button
               type="button"
@@ -242,7 +242,7 @@ export default function AdminCustomers() {
               disabled={userPage?.last ?? true}
               className="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 disabled:opacity-50"
             >
-              Next
+              Tiếp
             </button>
           </div>
         </div>

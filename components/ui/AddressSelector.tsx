@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { locationApi } from "../../lib/api/location";
-import { Province, District, Ward } from "../../types/location";
+import { Province, District, Ward } from "@/schemas/location";
 
 interface AddressSelectorProps {
   onAddressChange: (data: {

@@ -10,9 +10,9 @@ import {
   toggleDiscountStatus,
 } from '@/lib/api/discount';
 import { getErrorMessage } from '@/lib/error';
-import type { PageResponse } from '@/types/api';
-import type { AdminDiscountQuery } from '@/types/query';
-import { DiscountResponse, DiscountRequest } from '@/types/discount';
+import type { PageResponse } from '@/schemas/api';
+import type { AdminDiscountQuery } from '@/schemas/query';
+import { DiscountResponse, DiscountRequest } from '@/schemas/discount';
 import { toast } from 'react-hot-toast';
 
 export function useDiscount() {
@@ -41,7 +41,7 @@ export function useDiscount() {
         applyPageData(response.data);
       }
     } catch (error: unknown) {
-      toast.error(getErrorMessage(error, 'Failed to fetch discounts'));
+      toast.error(getErrorMessage(error, 'Không thể tải danh sách giảm giá'));
     } finally {
       setIsLoading(false);
     }
@@ -55,7 +55,7 @@ export function useDiscount() {
         setCurrentDiscount(response.data);
       }
     } catch (error: unknown) {
-      toast.error(getErrorMessage(error, 'Failed to fetch discount details'));
+      toast.error(getErrorMessage(error, 'Không thể tải chi tiết giảm giá'));
     } finally {
       setIsLoading(false);
     }
@@ -66,11 +66,11 @@ export function useDiscount() {
     try {
       const response = await createDiscount(data);
       if (response.code === 0) {
-        toast.success('Discount created successfully');
+        toast.success('Tạo mã giảm giá thành công');
         return response.data;
       }
     } catch (error: unknown) {
-      toast.error(getErrorMessage(error, 'Failed to create discount'));
+      toast.error(getErrorMessage(error, 'Không thể tạo mã giảm giá'));
     } finally {
       setIsLoading(false);
     }
@@ -81,11 +81,11 @@ export function useDiscount() {
     try {
       const response = await updateDiscount(id, data);
       if (response.code === 0) {
-        toast.success('Discount updated successfully');
+        toast.success('Cập nhật mã giảm giá thành công');
         return response.data;
       }
     } catch (error: unknown) {
-      toast.error(getErrorMessage(error, 'Failed to update discount'));
+      toast.error(getErrorMessage(error, 'Không thể cập nhật mã giảm giá'));
     } finally {
       setIsLoading(false);
     }
@@ -101,12 +101,12 @@ export function useDiscount() {
         } else {
           setDiscounts((prev) => prev.filter((d) => d.discountId !== id));
         }
-        toast.success('Discount deleted successfully');
+        toast.success('Xóa mã giảm giá thành công');
         return true;
       }
       return false;
     } catch (error: unknown) {
-      toast.error(getErrorMessage(error, 'Failed to delete discount'));
+      toast.error(getErrorMessage(error, 'Không thể xóa mã giảm giá'));
       return false;
     } finally {
       setIsLoading(false);
@@ -124,10 +124,10 @@ export function useDiscount() {
             prev.map((d) => (d.discountId === id ? response.data : d))
           );
         }
-        toast.success(response.message || 'Status updated');
+        toast.success(response.message || 'Cập nhật trạng thái thành công');
       }
     } catch (error: unknown) {
-      toast.error(getErrorMessage(error, 'Failed to update status'));
+      toast.error(getErrorMessage(error, 'Không thể cập nhật trạng thái'));
     }
   };
 

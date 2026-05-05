@@ -1,5 +1,5 @@
-import type { ReviewRequest, ReviewResponse, ReviewStatusResponse, StarBreakdown } from '@/types/review';
-import type { ApiResponse, PageResponse } from '@/types/api';
+import type { ReviewRequest, ReviewResponse, ReviewStatusResponse, StarBreakdown } from '@/schemas/review';
+import type { ApiResponse, PageResponse } from '@/schemas/api';
 import { fetcher } from '@/lib/fetcher';
 
 const buildReviewFormData = (request: ReviewRequest): FormData => {

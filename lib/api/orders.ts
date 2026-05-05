@@ -1,6 +1,6 @@
-import type { OrderRequest, OrderResponse } from '@/types/order';
-import type { ApiResponse, PageResponse } from '@/types/api';
-import type { AdminOrderQuery } from '@/types/query';
+import type { OrderRequest, OrderResponse } from '@/schemas/order';
+import type { ApiResponse, PageResponse } from '@/schemas/api';
+import type { AdminOrderQuery } from '@/schemas/query';
 import { fetcher } from '@/lib/fetcher';
 
 export const createOrder = async (request: OrderRequest): Promise<ApiResponse<OrderResponse>> => {

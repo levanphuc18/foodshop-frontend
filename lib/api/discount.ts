@@ -1,7 +1,7 @@
 import { fetcher } from '../fetcher';
-import type { ApiResponse, PageResponse } from '@/types/api';
-import type { AdminDiscountQuery } from '@/types/query';
-import { CouponValidationResponse, DiscountResponse, DiscountRequest } from '@/types/discount';
+import type { ApiResponse, PageResponse } from '@/schemas/api';
+import type { AdminDiscountQuery } from '@/schemas/query';
+import { CouponValidationResponse, DiscountResponse, DiscountRequest } from '@/schemas/discount';
 
 export const getAllDiscountsAdmin = async (): Promise<ApiResponse<DiscountResponse[]>> => {
   return await fetcher<ApiResponse<DiscountResponse[]>>('/admin/discounts', {

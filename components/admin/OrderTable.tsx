@@ -1,9 +1,8 @@
 'use client';
 
 import React from 'react';
-import { formatPrice } from '@/lib/utils';
-import { OrderResponse } from '@/types/order';
-import { format } from 'date-fns';
+import { formatPrice, formatDate } from '@/lib/utils';
+import { OrderResponse } from '@/schemas/order';
 
 interface OrderTableProps {
   orders: OrderResponse[];
@@ -39,7 +38,7 @@ export const OrderTable: React.FC<OrderTableProps> = ({ orders, isLoading, onVie
             <tr key={o.orderId} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/30 transition-colors">
               <td className="px-6 py-4">
                 <div className="text-sm font-bold text-sky-600 dark:text-sky-400">#{o.orderId}</div>
-                <div className="text-[10px] text-slate-500 dark:text-slate-400">{format(new Date(o.createdAt), 'MMM dd, yyyy HH:mm')}</div>
+                <div className="text-[10px] text-slate-500 dark:text-slate-400">{formatDate(o.createdAt, 'MMM DD, YYYY HH:mm')}</div>
               </td>
               <td className="px-6 py-4">
                 <div className="text-sm font-semibold text-slate-900 dark:text-white">{o.fullName || o.username || `User #${o.userId}`}</div>

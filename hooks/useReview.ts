@@ -3,8 +3,8 @@
 import { useState, useCallback } from 'react';
 import * as reviewApi from '@/lib/api/reviews';
 import { getErrorMessage } from '@/lib/error';
-import type { ReviewRequest, ReviewResponse, ReviewStatusResponse, StarBreakdown } from '@/types/review';
-import type { PageResponse } from '@/types/api';
+import type { ReviewRequest, ReviewResponse, ReviewStatusResponse, StarBreakdown } from '@/schemas/review';
+import type { PageResponse } from '@/schemas/api';
 
 export function useReview() {
   const [isLoading, setIsLoading] = useState(false);
@@ -26,10 +26,10 @@ export function useReview() {
       if (response.code === 0) {
         return response.data;
       }
-      setErrorMsg(response.message || 'Loi khi tao danh gia');
+      setErrorMsg(response.message || 'Lỗi khi tạo đánh giá');
       return null;
     } catch (error: unknown) {
-      setErrorMsg(getErrorMessage(error, 'Co loi khi tao danh gia'));
+      setErrorMsg(getErrorMessage(error, 'Có lỗi khi tạo đánh giá'));
       return null;
     } finally {
       setIsSubmitting(false);
@@ -44,10 +44,10 @@ export function useReview() {
       if (response.code === 0) {
         return response.data;
       }
-      setErrorMsg(response.message || 'Loi khi cap nhat danh gia');
+      setErrorMsg(response.message || 'Lỗi khi cập nhật đánh giá');
       return null;
     } catch (error: unknown) {
-      setErrorMsg(getErrorMessage(error, 'Co loi khi cap nhat danh gia'));
+      setErrorMsg(getErrorMessage(error, 'Có lỗi khi cập nhật đánh giá'));
       return null;
     } finally {
       setIsSubmitting(false);
@@ -72,10 +72,10 @@ export function useReview() {
       if (response.code === 0) {
         setReviews(response.data);
       } else {
-        setErrorMsg(response.message || 'Loi khi tai danh sach danh gia');
+        setErrorMsg(response.message || 'Lỗi khi tải danh sách đánh giá');
       }
     } catch (error: unknown) {
-      setErrorMsg(getErrorMessage(error, 'Co loi khi tai danh sach danh gia'));
+      setErrorMsg(getErrorMessage(error, 'Có lỗi khi tải danh sách đánh giá'));
     } finally {
       setIsLoading(false);
     }
@@ -100,10 +100,10 @@ export function useReview() {
       if (response.code === 0) {
         setReviewStatus(response.data);
       } else {
-        setErrorMsg(response.message || 'Loi khi tai trang thai danh gia');
+        setErrorMsg(response.message || 'Lỗi khi tải trạng thái đánh giá');
       }
     } catch (error: unknown) {
-      setErrorMsg(getErrorMessage(error, 'Co loi khi tai trang thai danh gia'));
+      setErrorMsg(getErrorMessage(error, 'Có lỗi khi tải trạng thái đánh giá'));
     } finally {
       setIsLoading(false);
     }

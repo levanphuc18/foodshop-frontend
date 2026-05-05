@@ -3,9 +3,9 @@
 import { useState, useCallback, useRef } from 'react';
 import * as userApi from '@/lib/api/user';
 import { getErrorMessage } from '@/lib/error';
-import type { PageResponse } from '@/types/api';
-import type { AdminUserQuery } from '@/types/query';
-import { UserResponse } from '@/types/user';
+import type { PageResponse } from '@/schemas/api';
+import type { AdminUserQuery } from '@/schemas/query';
+import { UserResponse } from '@/schemas/user';
 import { toast } from 'react-hot-toast';
 
 export function useUser() {
@@ -58,14 +58,14 @@ export function useUser() {
               }
             : current
         );
-        toast.success(response.message || 'Cap nhat trang thai thanh cong');
+        toast.success(response.message || 'Cập nhật trạng thái thành công');
         return true;
       }
 
-      toast.error(response.message || 'Khong the cap nhat trang thai');
+      toast.error(response.message || 'Không thể cập nhật trạng thái');
       return false;
     } catch (error: unknown) {
-      toast.error(getErrorMessage(error, 'Loi he thong khi cap nhat trang thai'));
+      toast.error(getErrorMessage(error, 'Lỗi hệ thống khi cập nhật trạng thái'));
       return false;
     }
   };

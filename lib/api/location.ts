@@ -1,6 +1,6 @@
 import { fetcher } from "../fetcher";
-import { Province, District, Ward } from "../../types/location";
-import { ApiResponse } from "../../types/api";
+import { Province, District, Ward } from "@/schemas/location";
+import { ApiResponse } from "@/schemas/api";
 
 export const locationApi = {
   getProvinces: async (): Promise<ApiResponse<Province[]>> => {

@@ -3,8 +3,9 @@
 import { useState, useCallback } from 'react';
 import * as productApi from '@/lib/api/product';
 import { getErrorMessage } from '@/lib/error';
-import type { BulkAssignDiscountRequest, PageResponse, ProductRequest, ProductResponse } from '@/types/product';
-import type { AdminProductQuery, ProductQuery } from '@/types/query';
+import type { BulkAssignDiscountRequest, ProductRequest, ProductResponse } from '@/schemas/product';
+import type { PageResponse } from '@/schemas/api';
+import type { AdminProductQuery, ProductQuery } from '@/schemas/query';
 
 export function useProduct() {
   const [isLoading, setIsLoading] = useState(false);

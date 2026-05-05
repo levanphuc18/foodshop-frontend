@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { AuthResponse } from '@/types/auth';
+import type { AuthResponse } from '@/schemas/auth';
 import { clearAuthCookies } from '@/lib/api/auth';
 import { useCartStore } from './cartStore';
 import { useNotificationStore } from './notificationStore';

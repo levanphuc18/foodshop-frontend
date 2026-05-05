@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { NotificationItem } from '@/types/notification';
+import type { NotificationItem } from '@/schemas/notification';
 
 interface NotificationState {
   items: NotificationItem[];

@@ -8,7 +8,7 @@ import { getNotifications, getUnreadNotificationCount } from '@/lib/api/notifica
 import { WS_BASE_URL } from '@/lib/constants';
 import { useAuthStore } from '@/store/authStore';
 import { useNotificationStore } from '@/store/notificationStore';
-import type { NotificationItem } from '@/types/notification';
+import type { NotificationItem } from '@/schemas/notification';
 
 export default function NotificationProvider() {
   const clientRef = useRef<Client | null>(null);

@@ -1,8 +1,7 @@
 'use client';
 
-import { formatPrice } from '@/lib/utils';
-import { OrderResponse } from '@/types/order';
-import { format } from 'date-fns';
+import { formatPrice, formatDate } from '@/lib/utils';
+import { OrderResponse } from '@/schemas/order';
 
 interface OrderDetailModalProps {
   order: OrderResponse | null;
@@ -24,7 +23,7 @@ export default function OrderDetailModal({ order, onClose }: OrderDetailModalPro
         <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
           <div>
             <h3 className="text-lg font-bold text-slate-900 dark:text-white">Order Details #{order.orderId}</h3>
-            <p className="text-xs text-slate-400">{format(new Date(order.createdAt), 'MMMM dd, yyyy HH:mm')}</p>
+            <p className="text-xs text-slate-400">{formatDate(order.createdAt, 'MMMM DD, YYYY HH:mm')}</p>
           </div>
           <button 
             onClick={onClose}

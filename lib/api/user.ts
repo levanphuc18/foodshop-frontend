@@ -1,7 +1,7 @@
 import { fetcher } from '../fetcher';
-import type { ApiResponse, PageResponse } from '@/types/api';
-import type { AdminUserQuery } from '@/types/query';
-import { UserResponse } from '@/types/user';
+import type { ApiResponse, PageResponse } from '@/schemas/api';
+import type { AdminUserQuery } from '@/schemas/query';
+import { UserResponse } from '@/schemas/user';
 
 export const getAllUsers = async (): Promise<ApiResponse<UserResponse[]>> => {
   return await fetcher<ApiResponse<UserResponse[]>>('/admin/users', {

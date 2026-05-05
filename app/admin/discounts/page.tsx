@@ -1,13 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { formatPrice } from '@/lib/utils';
+import { formatPrice, formatDate } from '@/lib/utils';
 import PageHeader from '@/components/admin/PageHeader';
 import Panel from '@/components/admin/Panel';
 import StatsCard from '@/components/admin/StatsCard';
 import ConfirmModal from '@/components/admin/ConfirmModal';
 import { useDiscount } from '@/hooks/useDiscount';
-import { format } from 'date-fns';
 import Link from 'next/link';
 
 export default function AdminDiscountsPage() {
@@ -76,22 +75,22 @@ export default function AdminDiscountsPage() {
   return (
     <div className="p-8 min-h-screen bg-slate-50 dark:bg-slate-950">
       <PageHeader
-        eyebrow="PROMOTIONS"
-        title="Discount Hub"
-        description="Manage your artisanal seafood coupons and promotional offers."
+        eyebrow="KHUYẾN MÃI"
+        title="Quản lý giảm giá"
+        description="Quản lý mã giảm giá và chương trình khuyến mãi."
         action={
           <Link href="/admin/discounts/create" className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sky-600 text-white text-sm font-bold hover:bg-sky-700 active:scale-95 transition-all shadow-lg shadow-sky-600/20 shrink-0">
             <span className="material-symbols-outlined text-lg">add_card</span>
-            New Discount
+            Thêm mã giảm giá
           </Link>
         }
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-5 mb-8">
-        <StatsCard icon="confirmation_number" label="Total Codes" value={(discountPage?.totalElements ?? discounts.length).toString()} sub="Matched backend results" trendUp toneClassName="text-sky-600 bg-sky-50 dark:bg-sky-900/20" />
-        <StatsCard icon="check_circle" label="Active On Page" value={activeCount.toString()} sub="Current page snapshot" toneClassName="text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20" />
-        <StatsCard icon="history" label="Expired On Page" value={expiredCount.toString()} sub="Current page snapshot" toneClassName="text-amber-600 bg-amber-50 dark:bg-amber-900/20" />
-        <StatsCard icon="block" label="Disabled On Page" value={disabledCount.toString()} sub="Current page snapshot" toneClassName="text-rose-600 bg-rose-50 dark:bg-rose-900/20" />
+        <StatsCard icon="confirmation_number" label="Tổng mã" value={(discountPage?.totalElements ?? discounts.length).toString()} sub="Kết quả từ hệ thống" trendUp toneClassName="text-sky-600 bg-sky-50 dark:bg-sky-900/20" />
+        <StatsCard icon="check_circle" label="Đang hoạt động" value={activeCount.toString()} sub="Trang hiện tại" toneClassName="text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20" />
+        <StatsCard icon="history" label="Hết hạn" value={expiredCount.toString()} sub="Trang hiện tại" toneClassName="text-amber-600 bg-amber-50 dark:bg-amber-900/20" />
+        <StatsCard icon="block" label="Đã tắt" value={disabledCount.toString()} sub="Trang hiện tại" toneClassName="text-rose-600 bg-rose-50 dark:bg-rose-900/20" />
       </div>
 
       <Panel className="overflow-hidden">
@@ -99,7 +98,7 @@ export default function AdminDiscountsPage() {
           <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
             <h2 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-sky-500"></span>
-              All Promotional Codes
+              Tất cả mã giảm giá
             </h2>
             <div className="flex flex-wrap gap-2 w-full lg:w-auto">
               <form
@@ -114,7 +113,7 @@ export default function AdminDiscountsPage() {
                 </button>
                 <input
                   type="text"
-                  placeholder="Search by code..."
+                  placeholder="Tìm theo mã..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20"
@@ -126,10 +125,10 @@ export default function AdminDiscountsPage() {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-[11px] font-black uppercase text-slate-600 dark:text-slate-200 focus:outline-none"
               >
-                <option value="ALL">All Status</option>
-                <option value="ACTIVE">Active Only</option>
-                <option value="EXPIRED">Expired</option>
-                <option value="DISABLED">Disabled</option>
+                <option value="ALL">Tất cả trạng thái</option>
+                <option value="ACTIVE">Hoạt động</option>
+                <option value="EXPIRED">Hết hạn</option>
+                <option value="DISABLED">Đã tắt</option>
               </select>
 
               <select
@@ -137,10 +136,10 @@ export default function AdminDiscountsPage() {
                 onChange={(e) => setTypeFilter(e.target.value)}
                 className="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-[11px] font-black uppercase text-slate-600 dark:text-slate-200 focus:outline-none"
               >
-                <option value="ALL">All Types</option>
-                <option value="ORDER">Order Voucher</option>
-                <option value="PRODUCT">Product Direct</option>
-                <option value="SHIPPING">Shipping</option>
+                <option value="ALL">Tất cả loại</option>
+                <option value="ORDER">Mã đơn hàng</option>
+                <option value="PRODUCT">Giảm giá sản phẩm</option>
+                <option value="SHIPPING">Vận chuyển</option>
               </select>
 
               <select
@@ -148,10 +147,10 @@ export default function AdminDiscountsPage() {
                 onChange={(e) => setSortBy(e.target.value)}
                 className="px-3 py-2 bg-sky-50 dark:bg-sky-900/20 border border-sky-100 dark:border-sky-800/50 rounded-xl text-[11px] font-black uppercase text-sky-700 dark:text-sky-300 focus:outline-none"
               >
-                <option value="newest">Sort: Newest First</option>
-                <option value="expiry">Sort: Expiring Soon</option>
-                <option value="value">Sort: Highest Value</option>
-                <option value="code">Sort: Code A-Z</option>
+                <option value="newest">Sắp xếp: Mới nhất</option>
+                <option value="expiry">Sắp xếp: Sắp hết hạn</option>
+                <option value="value">Sắp xếp: Giá trị cao</option>
+                <option value="code">Sắp xếp: Mã A-Z</option>
               </select>
             </div>
           </div>
@@ -161,19 +160,19 @@ export default function AdminDiscountsPage() {
           <table className="w-full text-left">
             <thead>
               <tr className="bg-slate-50 dark:bg-slate-800/50">
-                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Discount Code</th>
-                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Value</th>
-                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Type</th>
-                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Validity</th>
-                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 text-center">Status</th>
-                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 text-right">Actions</th>
+                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Mã giảm giá</th>
+                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Giá trị</th>
+                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Loại</th>
+                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Hiệu lực</th>
+                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 text-center">Trạng thái</th>
+                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 text-right">Thao tác</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {discounts.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-slate-400 italic text-sm">
-                    No discount codes found.
+                    Không tìm thấy mã giảm giá.
                   </td>
                 </tr>
               ) : (
@@ -196,10 +195,10 @@ export default function AdminDiscountsPage() {
                       </div>
                       <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium italic mt-1 space-y-0.5">
                         {discount.type !== 'PRODUCT' && (
-                          <div>Min Order: {formatPrice(discount.minOrderAmount || 0)}</div>
+                          <div>Đơn tối thiểu: {formatPrice(discount.minOrderAmount || 0)}</div>
                         )}
                         {discount.maxDiscount && discount.maxDiscount > 0 ? (
-                          <div>Max Cap: {formatPrice(discount.maxDiscount)}</div>
+                          <div>Giảm tối đa: {formatPrice(discount.maxDiscount)}</div>
                         ) : null}
                       </div>
                     </td>
@@ -215,7 +214,7 @@ export default function AdminDiscountsPage() {
                     <td className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400">
                       <div className="flex items-center gap-1">
                         <span className="material-symbols-outlined text-[14px]">calendar_today</span>
-                        {format(new Date(discount.startDate), 'MMM dd')} - {format(new Date(discount.endDate), 'MMM dd, yyyy')}
+                        {formatDate(discount.startDate, 'DD/MM')} - {formatDate(discount.endDate, 'DD/MM/YYYY')}
                       </div>
                     </td>
                     <td className="px-6 py-4 text-center">
@@ -231,8 +230,8 @@ export default function AdminDiscountsPage() {
                           onClick={() => toggleStatus(discount.discountId)}
                           title={
                             resolveStatus(discount) === 'EXPIRED'
-                              ? 'Expired – cannot change status'
-                              : resolveStatus(discount) === 'DISABLED' ? 'Enable' : 'Disable'
+                              ? 'Hết hạn – không thể thay đổi'
+                              : resolveStatus(discount) === 'DISABLED' ? 'Bật' : 'Tắt'
                           }
                           disabled={resolveStatus(discount) === 'EXPIRED'}
                           className={`p-2 rounded-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
@@ -271,10 +270,10 @@ export default function AdminDiscountsPage() {
 
         <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between bg-slate-50/30">
           <p className="text-[11px] text-slate-500 dark:text-slate-400 font-black uppercase tracking-widest">
-            Showing {discounts.length === 0 ? 0 : (discountPage?.currentPage ?? 0) * (discountPage?.pageSize ?? discounts.length) + 1}
+            Hiển thị {discounts.length === 0 ? 0 : (discountPage?.currentPage ?? 0) * (discountPage?.pageSize ?? discounts.length) + 1}
             -
             {discounts.length === 0 ? 0 : (discountPage?.currentPage ?? 0) * (discountPage?.pageSize ?? discounts.length) + discounts.length}
-            {' '}of {discountPage?.totalElements ?? discounts.length} promotions
+            {' '}/ {discountPage?.totalElements ?? discounts.length} mã giảm giá
           </p>
           <div className="flex items-center gap-2">
             <button
@@ -283,10 +282,10 @@ export default function AdminDiscountsPage() {
               disabled={discountPage?.first ?? true}
               className="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 disabled:opacity-50"
             >
-              Previous
+              Trước
             </button>
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 min-w-[90px] text-center">
-              Page {(discountPage?.currentPage ?? 0) + 1} / {Math.max(discountPage?.totalPages ?? 1, 1)}
+              Trang {(discountPage?.currentPage ?? 0) + 1} / {Math.max(discountPage?.totalPages ?? 1, 1)}
             </span>
             <button
               type="button"
@@ -294,7 +293,7 @@ export default function AdminDiscountsPage() {
               disabled={discountPage?.last ?? true}
               className="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 disabled:opacity-50"
             >
-              Next
+              Tiếp
             </button>
           </div>
         </div>
@@ -302,9 +301,9 @@ export default function AdminDiscountsPage() {
 
       <ConfirmModal
         isOpen={deleteId !== null}
-        title="Delete Promotion"
-        message={`Are you sure you want to permanently remove the discount code "${deleteCode}"? This action cannot be undone.`}
-        confirmLabel="Delete Code"
+        title="Xóa mã giảm giá"
+        message={`Bạn có chắc chắn muốn xóa vĩnh viễn mã giảm giá "${deleteCode}"? Hành động này không thể hoàn tác.`}
+        confirmLabel="Xóa"
         onConfirm={confirmDelete}
         onCancel={() => setDeleteId(null)}
         isLoading={isLoading}

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { login as loginApi, register as registerApi } from '@/lib/api/auth';
 import { getErrorMessage } from '@/lib/error';
 import { useAuthStore } from '@/store/authStore';
-import type { AuthRequest, RegisterRequest } from '@/types/auth';
+import type { AuthRequest, RegisterRequest } from '@/schemas/auth';
 
 export function useAuth() {
   const store = useAuthStore();
@@ -32,10 +32,10 @@ export function useAuth() {
         return true;
       }
 
-      setErrorMsg(response.message || 'Dang nhap that bai.');
+      setErrorMsg(response.message || 'Đăng nhập thất bại.');
       return false;
     } catch (error: unknown) {
-      setErrorMsg(getErrorMessage(error, 'Co loi xay ra khi ket noi may chu.'));
+      setErrorMsg(getErrorMessage(error, 'Có lỗi xảy ra khi kết nối máy chủ.'));
       return false;
     } finally {
       setIsLoading(false);
@@ -50,15 +50,15 @@ export function useAuth() {
     try {
       const response = await registerApi(credentials);
       if (response.code === 0) {
-        setSuccessMsg('Dang ky thanh cong! Dang chuyen huong...');
+        setSuccessMsg('Đăng ký thành công! Đang chuyển hướng...');
         setTimeout(() => router.push('/login'), 2000);
         return true;
       }
 
-      setErrorMsg(response.message || 'Dang ky that bai');
+      setErrorMsg(response.message || 'Đăng ký thất bại');
       return false;
     } catch (error: unknown) {
-      setErrorMsg(getErrorMessage(error, 'Co loi xay ra khi ket noi may chu.'));
+      setErrorMsg(getErrorMessage(error, 'Có lỗi xảy ra khi kết nối máy chủ.'));
       return false;
     } finally {
       setIsLoading(false);

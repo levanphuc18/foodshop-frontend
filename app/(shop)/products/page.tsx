@@ -5,8 +5,8 @@ import { useProduct } from '@/hooks/useProduct';
 import { useCategory } from '@/hooks/useCategory';
 import { useCart } from '@/hooks/useCart';
 import { formatPrice } from '@/lib/utils';
-import type { ProductResponse } from '@/types/product';
-import type { CategoryResponse } from '@/types/category';
+import type { ProductResponse } from '@/schemas/product';
+import type { CategoryResponse } from '@/schemas/category';
 import ProductGridCard from './_components/ProductGridCard';
 import ProductListCard from './_components/ProductListCard';
 import type { ProductListItem } from './_components/types';
@@ -35,7 +35,6 @@ export default function ProductsPage() {
   const [priceRange, setPriceRange] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState('featured');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [wishlist, setWishlist] = useState<string[]>([]);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
 
@@ -80,9 +79,6 @@ export default function ProductsPage() {
     setSearch('');
   };
 
-  const toggleWishlist = (id: string) => {
-    setWishlist((current) => (current.includes(id) ? current.filter((item) => item !== id) : [...current, id]));
-  };
 
   return (
     <div className="min-h-screen pt-20 bg-slate-50 dark:bg-slate-950">
@@ -233,10 +229,10 @@ export default function ProductsPage() {
 
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
               <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
-                <span className="font-black text-slate-900 dark:text-white">{productPage?.totalElements ?? mappedProducts.length}</span> products matched
+                <span className="font-black text-slate-900 dark:text-white">{productPage?.totalElements ?? mappedProducts.length}</span> sản phẩm phù hợp
               </p>
               <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
-                Showing <span className="font-black text-slate-900 dark:text-white">{mappedProducts.length}</span> items on this page
+                Hiển thị <span className="font-black text-slate-900 dark:text-white">{mappedProducts.length}</span> sản phẩm trên trang này
               </p>
             </div>
 
@@ -247,10 +243,10 @@ export default function ProductsPage() {
             ) : mappedProducts.length === 0 ? (
               <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-16 flex flex-col items-center text-center">
                 <span className="material-symbols-outlined text-5xl text-slate-200 dark:text-slate-700 mb-4">search_off</span>
-                <p className="text-base font-black text-slate-900 dark:text-white mb-1">No products found</p>
-                <p className="text-sm text-slate-400 mb-6">Try a different category, price range, or search keyword.</p>
+                <p className="text-base font-black text-slate-900 dark:text-white mb-1">Không tìm thấy sản phẩm</p>
+                <p className="text-sm text-slate-400 mb-6">Thử thay đổi danh mục, khoảng giá hoặc từ khóa tìm kiếm.</p>
                 <button type="button" onClick={clearAll} className="px-6 py-2.5 bg-sky-600 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-sky-700 transition-all">
-                  Clear Filters
+                  Xóa bộ lọc
                 </button>
               </div>
             ) : viewMode === 'grid' ? (
@@ -259,8 +255,6 @@ export default function ProductsPage() {
                   <ProductGridCard
                     key={product.id}
                     product={product}
-                    isWishlisted={wishlist.includes(product.id)}
-                    onWishlist={() => toggleWishlist(product.id)}
                     onAddToCart={() =>
                       addToCart(Number(product.id), 1, {
                         productName: product.title,
@@ -277,8 +271,6 @@ export default function ProductsPage() {
                   <ProductListCard
                     key={product.id}
                     product={product}
-                    isWishlisted={wishlist.includes(product.id)}
-                    onWishlist={() => toggleWishlist(product.id)}
                     onAddToCart={() =>
                       addToCart(Number(product.id), 1, {
                         productName: product.title,

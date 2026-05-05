@@ -8,12 +8,10 @@ import type { ProductListItem } from './types';
 
 interface ProductListCardProps {
   product: ProductListItem;
-  isWishlisted: boolean;
-  onWishlist: () => void;
   onAddToCart: () => void;
 }
 
-export default function ProductListCard({ product, isWishlisted, onWishlist, onAddToCart }: ProductListCardProps) {
+export default function ProductListCard({ product, onAddToCart }: ProductListCardProps) {
   const [isAdded, setIsAdded] = useState(false);
   const { id, title, price, originalPrice, tag, badge, img, rating, reviews, inStock, origin } = product;
 
@@ -69,15 +67,6 @@ export default function ProductListCard({ product, isWishlisted, onWishlist, onA
             )}
           </div>
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={onWishlist}
-              className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all border ${isWishlisted ? 'border-red-200 dark:border-red-900/30 bg-red-50 dark:bg-red-900/10 text-red-500' : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:text-red-500'}`}
-            >
-              <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: isWishlisted ? "'FILL' 1" : "'FILL' 0" }}>
-                favorite
-              </span>
-            </button>
             {inStock ? (
               <button
                 type="button"

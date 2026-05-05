@@ -3,9 +3,9 @@
 import { useState, useCallback, useRef } from 'react';
 import * as orderApi from '@/lib/api/orders';
 import { getErrorMessage } from '@/lib/error';
-import type { PageResponse } from '@/types/api';
-import type { AdminOrderQuery } from '@/types/query';
-import type { OrderResponse } from '@/types/order';
+import type { PageResponse } from '@/schemas/api';
+import type { AdminOrderQuery } from '@/schemas/query';
+import type { OrderResponse } from '@/schemas/order';
 import { toast } from 'react-hot-toast';
 
 export function useAdminOrder() {
@@ -48,7 +48,7 @@ export function useAdminOrder() {
     try {
       const response = await orderApi.updateOrderStatus(id, status);
       if (response.code === 0) {
-        toast.success(`Cap nhat trang thai don hang #${id} thanh cong`);
+        toast.success(`Cập nhật trạng thái đơn hàng #${id} thành công`);
         if (lastPageOptionsRef.current) {
           await fetchOrderPage(lastPageOptionsRef.current);
         } else {
@@ -57,10 +57,10 @@ export function useAdminOrder() {
         return true;
       }
 
-      toast.error(response.message || 'Loi khi cap nhat trang thai');
+      toast.error(response.message || 'Lỗi khi cập nhật trạng thái');
       return false;
     } catch (error: unknown) {
-      toast.error(getErrorMessage(error, 'Co loi xay ra'));
+      toast.error(getErrorMessage(error, 'Có lỗi xảy ra'));
       return false;
     } finally {
       setIsLoading(false);

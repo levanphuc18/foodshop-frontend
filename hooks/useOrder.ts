@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import * as orderApi from '@/lib/api/orders';
 import { getErrorMessage } from '@/lib/error';
-import type { OrderResponse } from '@/types/order';
+import type { OrderResponse } from '@/schemas/order';
 
 export function useOrder() {
   const [isLoading, setIsLoading] = useState(false);

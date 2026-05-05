@@ -2,9 +2,9 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useDiscount } from '@/hooks/useDiscount';
-import type { DiscountResponse } from '@/types/discount';
-import type { ProductResponse } from '@/types/product';
-import { formatPrice } from '@/lib/utils';
+import type { DiscountResponse } from '@/schemas/discount';
+import type { ProductResponse } from '@/schemas/product';
+import { formatPrice, formatDate } from '@/lib/utils';
 
 interface AssignDiscountModalProps {
   isOpen: boolean;
@@ -15,7 +15,7 @@ interface AssignDiscountModalProps {
 }
 
 const formatDateRange = (discount: DiscountResponse) =>
-  `${new Date(discount.startDate).toLocaleDateString('vi-VN')} - ${new Date(discount.endDate).toLocaleDateString('vi-VN')}`;
+  `${formatDate(discount.startDate, 'DD/MM/YYYY')} - ${formatDate(discount.endDate, 'DD/MM/YYYY')}`;
 
 const computeSalePrice = (product: ProductResponse, discount: DiscountResponse) => {
   if (discount.discountUnit === 'AMOUNT') {
@@ -143,7 +143,7 @@ export default function AssignDiscountModal({
       <div className="w-full max-w-6xl rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-950">
         <div className="flex items-start justify-between gap-6 border-b border-slate-100 px-6 py-5 dark:border-slate-800">
           <div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Apply Product Discount</h3>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Áp dụng mã giảm giá sản phẩm</h3>
             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
               Assign one <span className="font-semibold text-sky-600 dark:text-sky-400">PRODUCT</span> discount to the selected products.
             </p>

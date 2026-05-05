@@ -11,7 +11,7 @@ import { toast } from 'react-hot-toast';
 import ProductDetailModal from '@/components/admin/ProductDetailModal';
 import ConfirmModal from '@/components/admin/ConfirmModal';
 import AssignDiscountModal from '@/components/admin/AssignDiscountModal';
-import { ProductResponse } from '@/types/product';
+import { ProductResponse } from '@/schemas/product';
 import { formatPrice } from '@/lib/utils';
 
 const productStatusStyles: Record<string, string> = {
@@ -21,9 +21,9 @@ const productStatusStyles: Record<string, string> = {
 };
 
 const productStatusLabels: Record<string, string> = {
-  IN_STOCK: 'In Stock',
-  LOW_STOCK: 'Low Stock',
-  OUT_OF_STOCK: 'Out of Stock',
+  IN_STOCK: 'Còn hàng',
+  LOW_STOCK: 'Sắp hết',
+  OUT_OF_STOCK: 'Hết hàng',
 };
 
 const sortMap: Record<string, { sortBy: string; sortDir: 'ASC' | 'DESC' }> = {
@@ -92,11 +92,11 @@ export default function AdminProducts() {
     if (!deleteId) return;
     const result = await deleteProduct(deleteId);
     if (result.success) {
-      toast.success(`Da xoa san pham ${deleteName}`);
+      toast.success(`Đã xóa sản phẩm ${deleteName}`);
       setDeleteId(null);
       loadProducts();
     } else {
-      toast.error(result.message || 'Khong the xoa san pham nay');
+      toast.error(result.message || 'Không thể xóa sản phẩm này');
     }
   };
 
@@ -126,7 +126,7 @@ export default function AdminProducts() {
     replaceExisting: boolean;
   }) => {
     if (selectedProductIds.length === 0) {
-      toast.error('Hay chon it nhat mot san pham');
+      toast.error('Hãy chọn ít nhất một sản phẩm');
       return;
     }
 
@@ -137,11 +137,11 @@ export default function AdminProducts() {
     });
 
     if (!result.success) {
-      toast.error(result.message || 'Khong the ap dung ma giam gia');
+      toast.error(result.message || 'Không thể áp dụng mã giảm giá');
       return;
     }
 
-    toast.success(discountId == null ? 'Da go bo giam gia cho san pham da chon' : 'Da ap dung ma giam gia cho san pham da chon');
+    toast.success(discountId == null ? 'Đã gỡ bỏ giảm giá cho sản phẩm đã chọn' : 'Đã áp dụng mã giảm giá cho sản phẩm đã chọn');
     setIsAssignDiscountOpen(false);
     setSelectedProductIds([]);
     loadProducts();
@@ -149,7 +149,7 @@ export default function AdminProducts() {
 
   const getCategoryName = (id: number) => {
     const category = categories.find((c) => c.categoryId === id);
-    return category ? category.name : 'Uncategorized';
+    return category ? category.name : 'Chưa phân loại';
   };
 
   const visibleCount = products.filter((p) => p.isActive).length;
@@ -158,22 +158,22 @@ export default function AdminProducts() {
   return (
     <div className="p-8 min-h-screen bg-slate-50 dark:bg-slate-950">
       <PageHeader
-        eyebrow="Catalog"
-        title="Inventory Stock"
-        description="Manage your artisanal preservation stock and logistics."
+        eyebrow="Danh mục"
+        title="Kho hàng"
+        description="Quản lý sản phẩm, tồn kho và vận hành."
         action={
           <Link href="/admin/products/create" className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sky-600 text-white text-sm font-bold hover:bg-sky-700 active:scale-95 transition-all shadow-lg shadow-sky-600/20 shrink-0">
             <span className="material-symbols-outlined text-lg">add</span>
-            Add Product
+            Thêm sản phẩm
           </Link>
         }
       />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatsCard icon="inventory_2" label="Total Products" value={String(productPage?.totalElements ?? products.length)} sub="Matched backend results" toneClassName="text-sky-600 bg-sky-50 dark:bg-sky-900/20" />
-        <StatsCard icon="check_circle" label="Visible On Page" value={String(visibleCount)} sub="Current page snapshot" toneClassName="text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20" />
-        <StatsCard icon="visibility_off" label="Hidden On Page" value={String(hiddenCount)} sub="Current page snapshot" toneClassName="text-amber-600 bg-amber-50 dark:bg-amber-900/20" />
-        <StatsCard icon="warning" label="Low Or Empty" value={String(products.filter((p) => p.productStatus !== 'IN_STOCK').length)} sub="Current page snapshot" toneClassName="text-red-500 bg-red-50 dark:bg-red-900/20" />
+        <StatsCard icon="inventory_2" label="Tổng sản phẩm" value={String(productPage?.totalElements ?? products.length)} sub="Kết quả từ hệ thống" toneClassName="text-sky-600 bg-sky-50 dark:bg-sky-900/20" />
+        <StatsCard icon="check_circle" label="Đang hiển thị" value={String(visibleCount)} sub="Trang hiện tại" toneClassName="text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20" />
+        <StatsCard icon="visibility_off" label="Đang ẩn" value={String(hiddenCount)} sub="Trang hiện tại" toneClassName="text-amber-600 bg-amber-50 dark:bg-amber-900/20" />
+        <StatsCard icon="warning" label="Sắp hết / Hết hàng" value={String(products.filter((p) => p.productStatus !== 'IN_STOCK').length)} sub="Trang hiện tại" toneClassName="text-red-500 bg-red-50 dark:bg-red-900/20" />
       </div>
 
       <Panel className="overflow-hidden">
@@ -181,7 +181,7 @@ export default function AdminProducts() {
           <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
             <h2 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-sky-500"></span>
-              All Products
+              Tất cả sản phẩm
             </h2>
             <div className="flex flex-wrap gap-2 w-full lg:w-auto">
               <button
@@ -191,7 +191,7 @@ export default function AdminProducts() {
                 className="inline-flex items-center gap-2 rounded-xl border border-sky-200 bg-sky-50 px-4 py-2 text-[11px] font-black uppercase tracking-wide text-sky-700 transition hover:bg-sky-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-sky-800/70 dark:bg-sky-900/20 dark:text-sky-300 dark:hover:bg-sky-900/30"
               >
                 <span className="material-symbols-outlined text-[18px]">sell</span>
-                Apply Discount ({selectedProductIds.length})
+                Áp dụng giảm giá ({selectedProductIds.length})
               </button>
               <form className="relative flex-1 min-w-[200px] lg:w-64" onSubmit={(e) => e.preventDefault()}>
                 <button
@@ -202,7 +202,7 @@ export default function AdminProducts() {
                 </button>
                 <input
                   type="text"
-                  placeholder="Search name or product ID..."
+                  placeholder="Tìm theo tên hoặc mã sản phẩm..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20"
@@ -214,7 +214,7 @@ export default function AdminProducts() {
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-[11px] font-black uppercase text-slate-600 dark:text-slate-200 focus:outline-none"
               >
-                <option value="">All Categories</option>
+                <option value="">Tất cả danh mục</option>
                 {categories.map((c) => <option key={c.categoryId} value={c.categoryId}>{c.name}</option>)}
               </select>
 
@@ -223,10 +223,10 @@ export default function AdminProducts() {
                 onChange={(e) => setStockFilter(e.target.value)}
                 className="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-[11px] font-black uppercase text-slate-600 dark:text-slate-200 focus:outline-none"
               >
-                <option value="ALL">All Status</option>
-                <option value="IN_STOCK">In Stock</option>
-                <option value="LOW_STOCK">Low Stock</option>
-                <option value="OUT_OF_STOCK">Out of Stock</option>
+                <option value="ALL">Tất cả trạng thái</option>
+                <option value="IN_STOCK">Còn hàng</option>
+                <option value="LOW_STOCK">Sắp hết</option>
+                <option value="OUT_OF_STOCK">Hết hàng</option>
               </select>
 
               <select
@@ -234,9 +234,9 @@ export default function AdminProducts() {
                 onChange={(e) => setVisibilityFilter(e.target.value)}
                 className="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-[11px] font-black uppercase text-slate-600 dark:text-slate-200 focus:outline-none"
               >
-                <option value="ALL">All Visibility</option>
-                <option value="PUBLIC">Public</option>
-                <option value="HIDDEN">Hidden</option>
+                <option value="ALL">Tất cả hiển thị</option>
+                <option value="PUBLIC">Công khai</option>
+                <option value="HIDDEN">Đang ẩn</option>
               </select>
 
               <select
@@ -244,12 +244,12 @@ export default function AdminProducts() {
                 onChange={(e) => setSortBy(e.target.value)}
                 className="px-3 py-2 bg-sky-50 dark:bg-sky-900/20 border border-sky-100 dark:border-sky-800/50 rounded-xl text-[11px] font-black uppercase text-sky-700 dark:text-sky-300 focus:outline-none"
               >
-                <option value="newest">Sort: Newest First</option>
-                <option value="name">Sort: Name A-Z</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="stock-high">Stock: High to Low</option>
-                <option value="stock-low">Stock: Low to High</option>
+                <option value="newest">Sắp xếp: Mới nhất</option>
+                <option value="name">Sắp xếp: Tên A-Z</option>
+                <option value="price-high">Giá: Cao → Thấp</option>
+                <option value="price-low">Giá: Thấp → Cao</option>
+                <option value="stock-high">Tồn kho: Nhiều → Ít</option>
+                <option value="stock-low">Tồn kho: Ít → Nhiều</option>
               </select>
             </div>
           </div>
@@ -268,21 +268,21 @@ export default function AdminProducts() {
                     aria-label="Select current page products"
                   />
                 </th>
-                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Product</th>
-                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Category</th>
-                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Price</th>
-                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Stock</th>
-                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Discount</th>
-                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 text-center">Visibility</th>
-                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Status</th>
-                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 text-right">Actions</th>
+                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Sản phẩm</th>
+                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Danh mục</th>
+                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Giá</th>
+                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Tồn kho</th>
+                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Giảm giá</th>
+                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 text-center">Hiển thị</th>
+                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Trạng thái</th>
+                <th className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 text-right">Thao tác</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {products.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="px-6 py-12 text-center text-slate-400 italic text-sm">
-                    No products found matching your criteria.
+                    Không tìm thấy sản phẩm phù hợp với tiêu chí tìm kiếm.
                   </td>
                 </tr>
               ) : (
@@ -353,26 +353,26 @@ export default function AdminProducts() {
                                 </div>
                                 <div className="text-[11px] text-slate-500 dark:text-slate-400">
                                   {p.discountUnit === 'PERCENT' && p.discountPercentage != null
-                                    ? `${p.discountPercentage}% off`
+                                    ? `Giảm ${p.discountPercentage}%`
                                     : p.salePrice != null
-                                      ? `${formatPrice(p.price - p.salePrice)} off`
-                                      : 'Product discount'}
+                                      ? `Giảm ${formatPrice(p.price - p.salePrice)}`
+                                      : 'Giảm giá sản phẩm'}
                                 </div>
                               </div>
                             );
                           }
-                          return <span className="text-sm text-slate-400 dark:text-slate-500">None</span>;
+                          return <span className="text-sm text-slate-400 dark:text-slate-500">Không có</span>;
                         })()}
                       </td>
                       <td className="px-6 py-4 text-center">
                         <div className="flex justify-center">
                           {p.isActive ? (
                             <span className="inline-flex items-center justify-center gap-1.5 w-[85px] py-1.5 rounded-full text-[10px] font-black uppercase tracking-tight bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 shadow-sm shadow-emerald-500/10">
-                              Public
+                              Công khai
                             </span>
                           ) : (
                             <span className="inline-flex items-center justify-center gap-1.5 w-[85px] py-1.5 rounded-full text-[10px] font-black uppercase tracking-tight bg-slate-100 text-slate-500 border border-slate-200 dark:bg-slate-800/50 dark:border-slate-700/50 dark:text-slate-400">
-                              Hidden
+                              Đang ẩn
                             </span>
                           )}
                         </div>
@@ -419,10 +419,10 @@ export default function AdminProducts() {
 
         <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between bg-slate-50/30">
           <p className="text-[11px] text-slate-500 dark:text-slate-400 font-black uppercase tracking-widest">
-            Showing {products.length === 0 ? 0 : (productPage?.currentPage ?? 0) * (productPage?.pageSize ?? products.length) + 1}
+            Hiển thị {products.length === 0 ? 0 : (productPage?.currentPage ?? 0) * (productPage?.pageSize ?? products.length) + 1}
             -
             {products.length === 0 ? 0 : (productPage?.currentPage ?? 0) * (productPage?.pageSize ?? products.length) + products.length}
-            {' '}of {productPage?.totalElements ?? products.length} products
+            {' '}/ {productPage?.totalElements ?? products.length} sản phẩm
           </p>
           <div className="flex items-center gap-2">
             <button
@@ -431,10 +431,10 @@ export default function AdminProducts() {
               onClick={() => setCurrentPage((page) => Math.max(0, page - 1))}
               className="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 disabled:opacity-50"
             >
-              Previous
+              Trước
             </button>
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 min-w-[90px] text-center">
-              Page {(productPage?.currentPage ?? 0) + 1} / {Math.max(productPage?.totalPages ?? 1, 1)}
+              Trang {(productPage?.currentPage ?? 0) + 1} / {Math.max(productPage?.totalPages ?? 1, 1)}
             </span>
             <button
               type="button"
@@ -442,7 +442,7 @@ export default function AdminProducts() {
               onClick={() => setCurrentPage((page) => page + 1)}
               className="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 disabled:opacity-50"
             >
-              Next
+              Tiếp
             </button>
           </div>
         </div>
@@ -451,9 +451,9 @@ export default function AdminProducts() {
       <ProductDetailModal product={viewProduct} onClose={() => setViewProduct(null)} categories={categories} />
       <ConfirmModal
         isOpen={deleteId !== null}
-        title="Delete Product"
-        message={`Are you sure you want to remove "${deleteName}"?`}
-        confirmLabel="Delete"
+        title="Xóa sản phẩm"
+        message={`Bạn có chắc chắn muốn xóa "${deleteName}" không?`}
+        confirmLabel="Xóa"
         onConfirm={confirmDelete}
         onCancel={() => setDeleteId(null)}
         isLoading={isLoading}

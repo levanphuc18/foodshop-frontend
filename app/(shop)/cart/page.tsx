@@ -5,7 +5,7 @@ import { useCart } from '@/hooks/useCart';
 import { useProduct } from '@/hooks/useProduct';
 import { formatPrice } from '@/lib/utils';
 import { validateCoupon } from '@/lib/api/discount';
-import { CouponValidationResponse } from '@/types/discount';
+import { CouponValidationResponse } from '@/schemas/discount';
 import { toast } from 'react-hot-toast';
 import { CartItem } from '@/components/shop/CartItem';
 
@@ -93,12 +93,12 @@ export default function CartPage() {
               <span className="material-symbols-outlined text-[16px] group-hover:-translate-x-1 transition-transform">
                 arrow_back
               </span>
-              Continue Shopping
+              Tiếp tục mua sắm
             </Link>
             <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
-              Your Cart
+              Giỏ hàng
               {itemCount > 0 && (
-                <span className="ml-3 text-base font-bold text-slate-400">({itemCount} items)</span>
+                <span className="ml-3 text-base font-bold text-slate-400">({itemCount} sản phẩm)</span>
               )}
             </h1>
           </div>
@@ -110,13 +110,13 @@ export default function CartPage() {
             <div className="w-20 h-20 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-6">
               <span className="material-symbols-outlined text-4xl text-slate-300">shopping_cart</span>
             </div>
-            <h2 className="text-lg font-black text-slate-900 dark:text-white mb-2">Your cart is empty</h2>
+            <h2 className="text-lg font-black text-slate-900 dark:text-white mb-2">Giỏ hàng trống</h2>
             <p className="text-sm text-slate-500 mb-8 max-w-xs">
-              Explore our curated collection of artisanal dried seafood.
+              Khám phá bộ sưu tập hải sản khô cao cấp của chúng tôi.
             </p>
             <Link href="/products">
               <button className="px-8 py-3 bg-sky-600 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-sky-700 transition-all shadow-lg shadow-sky-600/20">
-                Browse Collection
+                Xem sản phẩm
               </button>
             </Link>
           </div>
@@ -144,7 +144,7 @@ export default function CartPage() {
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-xs font-black uppercase tracking-widest text-slate-700 dark:text-white mb-3 flex items-center gap-2">
                     <span className="material-symbols-outlined text-[18px] text-sky-600">local_offer</span>
-                    Promo Code
+                    Mã giảm giá
                   </p>
                 </div>
 
@@ -180,7 +180,7 @@ export default function CartPage() {
                         disabled={isValidating || !promoCode.trim()}
                         className="px-5 py-2.5 rounded-xl bg-slate-900 dark:bg-sky-600 text-white text-xs font-black uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all disabled:opacity-50"
                       >
-                        {isValidating ? '...' : 'Apply'}
+                        {isValidating ? '...' : 'Áp dụng'}
                       </button>
                     </div>
                     {couponError && (
@@ -198,11 +198,11 @@ export default function CartPage() {
             <div className="space-y-4 lg:sticky lg:top-28">
               <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
                 <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800">
-                  <h2 className="text-sm font-black text-slate-900 dark:text-white">Order Summary</h2>
+                  <h2 className="text-sm font-black text-slate-900 dark:text-white">Tóm tắt đơn hàng</h2>
                 </div>
                 <div className="p-6 space-y-3.5">
                   <div className="flex justify-between items-center text-sm">
-                    <span className="text-slate-500 font-medium">Subtotal ({itemCount} items)</span>
+                    <span className="text-slate-500 font-medium">Tạm tính ({itemCount} sản phẩm)</span>
                     <span className="font-bold text-slate-900 dark:text-white">{formatPrice(subtotal)}</span>
                   </div>
                   {couponResult?.valid && couponResult.type === 'ORDER' && orderDiscount > 0 && (
@@ -212,7 +212,7 @@ export default function CartPage() {
                     </div>
                   )}
                   <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                    <span className="text-xs font-black uppercase tracking-widest text-slate-400">Total</span>
+                    <span className="text-xs font-black uppercase tracking-widest text-slate-400">Tổng cộng</span>
                     <span className="text-2xl font-black text-sky-600">{formatPrice(totalAmount)}</span>
                   </div>
                 </div>
@@ -223,19 +223,19 @@ export default function CartPage() {
                       disabled={hasInsufficientStock}
                       className="w-full py-3.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-sky-600/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed"
                     >
-                      {hasInsufficientStock ? 'Kho không đủ hàng' : 'Proceed to Checkout'}
+                      {hasInsufficientStock ? 'Kho không đủ hàng' : 'Tiến hành thanh toán'}
                     </button>
                   </Link>
                   <p className="text-[10px] text-center text-slate-400 font-bold uppercase tracking-widest mt-4 flex items-center justify-center gap-1.5">
                     <span className="material-symbols-outlined text-[13px]">verified_user</span>
-                    Secure AES-256 Encryption
+                    Mã hóa bảo mật AES-256
                   </p>
                 </div>
               </div>
 
               {/* Accepted payments */}
               <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">We Accept</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">Chấp nhận thanh toán</p>
                 <div className="flex gap-2">
                   {['VISA', 'MC', 'AMEX', 'JCB'].map((brand) => (
                     <div
@@ -253,9 +253,9 @@ export default function CartPage() {
                 <div className="flex items-start gap-3">
                   <span className="material-symbols-outlined text-sky-600 text-xl mt-0.5">local_shipping</span>
                   <div>
-                    <p className="text-xs font-black uppercase tracking-widest text-sky-600 mb-1">Free returns</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-sky-600 mb-1">Đổi trả miễn phí</p>
                     <p className="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
-                      Not satisfied? Return within 14 days for a full refund, no questions asked.
+                      Không hài lòng? Đổi trả trong 14 ngày, hoàn tiền đầy đủ, không cần lý do.
                     </p>
                   </div>
                 </div>

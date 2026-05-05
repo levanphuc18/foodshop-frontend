@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react';
 import * as cartApi from '@/lib/api/cart';
 import { useCartStore } from '@/store/cartStore';
 import { useAuthStore } from '@/store/authStore';
-import { CartItemResponse } from '@/types/cart';
+import { CartItemResponse } from '@/schemas/cart';
 
 export function useCart() {
   const { items, addItem: addToStore, setItems, removeItem: removeFromStore, updateQuantity: updateStoreQty, clearCart: clearStore, total } = useCartStore();

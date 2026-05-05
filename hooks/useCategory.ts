@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import * as categoryApi from '@/lib/api/category';
 import { getErrorMessage } from '@/lib/error';
-import { CategoryResponse } from '@/types/category';
+import { CategoryResponse } from '@/schemas/category';
 
 export function useCategory() {
   const [categories, setCategories] = useState<CategoryResponse[]>([]);

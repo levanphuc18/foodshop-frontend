@@ -2,11 +2,10 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { formatPrice } from '@/lib/utils';
+import { formatPrice, cn, formatDate } from '@/lib/utils';
 import AccountPageShell from '@/components/shop/account/AccountPageShell';
 import AccountSectionHeader from '@/components/shop/account/AccountSectionHeader';
 import { useOrder } from '@/hooks/useOrder';
-import dayjs from 'dayjs';
 
 export default function Pageorders() {
   const { orders, fetchMyOrders, isLoading, errorMsg } = useOrder();
@@ -39,19 +38,19 @@ export default function Pageorders() {
           ) : orders.length === 0 ? (
             <div className="text-center py-12 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
               <span className="material-symbols-outlined text-4xl text-slate-300 dark:text-slate-700 mb-4">inventory_2</span>
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1">No orders yet</h3>
-              <p className="text-xs text-slate-500 mb-6">Looks like you haven&apos;t made your first curated selection.</p>
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1">Chưa có đơn hàng</h3>
+              <p className="text-xs text-slate-500 mb-6">Có vẻ như bạn chưa đặt đơn hàng đầu tiên.</p>
               <Link href="/products" className="px-6 py-2 bg-slate-900 dark:bg-sky-600 text-white rounded-lg text-xs font-bold transition-all shadow-md">
-                Start Shopping
+                Mua sắm ngay
               </Link>
             </div>
           ) : (
             orders.map((order) => {
-              const date = dayjs(order.createdAt).format('MMM DD, YYYY');
+              const date = formatDate(order.createdAt, 'DD/MM/YYYY');
               const firstItemImg = order.orderItems[0]?.productImageUrl || 'https://via.placeholder.com/150';
               const titleSummary = order.orderItems.length > 0
-                ? `${order.orderItems[0].productName} ${order.orderItems.length > 1 ? `& ${order.orderItems.length - 1} other item(s)` : ''}`
-                : 'Empty Order';
+                ? `${order.orderItems[0].productName} ${order.orderItems.length > 1 ? `và ${order.orderItems.length - 1} sản phẩm khác` : ''}`
+                : 'Đơn trống';
               const originalTotal = order.totalAmount + order.shippingFee;
               const totalSavings = order.discountAmount + order.shippingDiscount;
 

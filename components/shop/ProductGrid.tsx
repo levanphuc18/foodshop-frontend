@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { ProductCard } from './ProductCard';
-import type { ProductResponse } from '@/types/product';
+import type { ProductResponse } from '@/schemas/product';
 
 interface ProductGridProps {
   products: ProductResponse[];

@@ -84,9 +84,9 @@ export default function NotificationBell() {
         <div className="absolute right-0 mt-3 w-[360px] max-w-[calc(100vw-2rem)] rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-2xl shadow-slate-900/10 overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-800">
             <div>
-              <p className="text-sm font-black text-slate-900 dark:text-white">Notifications</p>
+              <p className="text-sm font-black text-slate-900 dark:text-white">Thông báo</p>
               <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-                {connected ? 'Realtime connected' : 'Reconnecting...'}
+                {connected ? 'Đã kết nối thời gian thực' : 'Đang kết nối lại...'}
               </p>
             </div>
             <button
@@ -95,14 +95,14 @@ export default function NotificationBell() {
               onClick={handleMarkAll}
               className="text-[11px] font-black uppercase tracking-wide text-sky-600 disabled:text-slate-400"
             >
-              Mark all read
+              Đánh dấu tất cả đã đọc
             </button>
           </div>
 
           <div className="max-h-[420px] overflow-y-auto">
             {notifications.length === 0 ? (
               <div className="px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
-                No notifications yet.
+                Chưa có thông báo nào.
               </div>
             ) : (
               notifications.map((item) => (
@@ -118,7 +118,7 @@ export default function NotificationBell() {
                         <span>{formatRelative(item.createdAt)}</span>
                         {item.orderId && (
                           <Link href={`/orders/${item.orderId}`} className="text-sky-600">
-                            View order
+                            Xem đơn hàng
                           </Link>
                         )}
                       </div>
@@ -131,7 +131,7 @@ export default function NotificationBell() {
                         onClick={() => handleMarkOne(item.notificationId)}
                         className="text-[11px] font-black uppercase tracking-wide text-slate-600 dark:text-slate-300"
                       >
-                        Read
+                        Đã đọc
                       </button>
                     )}
                   </div>

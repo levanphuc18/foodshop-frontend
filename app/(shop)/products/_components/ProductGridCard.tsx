@@ -8,12 +8,10 @@ import type { ProductListItem } from './types';
 
 interface ProductGridCardProps {
   product: ProductListItem;
-  isWishlisted: boolean;
-  onWishlist: () => void;
   onAddToCart: () => void;
 }
 
-export default function ProductGridCard({ product, isWishlisted, onWishlist, onAddToCart }: ProductGridCardProps) {
+export default function ProductGridCard({ product, onAddToCart }: ProductGridCardProps) {
   const [isAdded, setIsAdded] = useState(false);
   const { id, title, price, originalPrice, tag, badge, img, rating, reviews, inStock } = product;
 
@@ -28,15 +26,6 @@ export default function ProductGridCard({ product, isWishlisted, onWishlist, onA
           {tag}
         </span>
 
-        <button
-          type="button"
-          onClick={onWishlist}
-          className={`absolute top-3 right-3 w-8 h-8 rounded-lg flex items-center justify-center transition-all shadow ${isWishlisted ? 'bg-red-500 text-white' : 'bg-white/90 dark:bg-slate-900/90 text-slate-400 hover:text-red-500'}`}
-        >
-          <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: isWishlisted ? "'FILL' 1" : "'FILL' 0" }}>
-            favorite
-          </span>
-        </button>
 
         {!inStock ? (
           <div className="absolute inset-0 bg-white/60 dark:bg-slate-900/60 flex items-center justify-center">

@@ -71,32 +71,32 @@ export default function AdminDashboard() {
   return (
     <div className="p-8 min-h-screen bg-slate-50 dark:bg-slate-950">
       <PageHeader
-        eyebrow="Overview"
-        title="Operations Dashboard"
-        description="Real-time overview of your coastal preservation business."
+        eyebrow="Tổng quan"
+        title="Bảng điều khiển"
+        description="Tổng quan hoạt động kinh doanh theo thời gian thực."
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
-        <StatsCard icon="payments" label="Total Revenue" value={formatPrice(totalRevenue)} sub="Gross confirmed earnings" trendUp />
-        <StatsCard icon="shopping_bag" label="Active Orders" value={activeOrders.toString()} sub={`${orders.filter(o => o.status === 'PENDING').length} pending dispatch`} />
+        <StatsCard icon="payments" label="Tổng doanh thu" value={formatPrice(totalRevenue)} sub="Doanh thu đã xác nhận" trendUp />
+        <StatsCard icon="shopping_bag" label="Đơn đang xử lý" value={activeOrders.toString()} sub={`${orders.filter(o => o.status === 'PENDING').length} chờ gửi hàng`} />
         <StatsCard 
           icon="warning" 
-          label="Stock Alerts" 
-          value={`${stockAlerts} Items`} 
-          sub="Low inventory warning" 
+          label="Cảnh báo tồn kho" 
+          value={`${stockAlerts} sản phẩm`} 
+          sub="Tồn kho thấp" 
           toneClassName={stockAlerts > 0 ? "text-red-500 bg-red-50 dark:bg-red-900/20 dark:text-red-400" : "text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20"} 
         />
-        <StatsCard icon="group_add" label="Total Customers" value={(users ?? []).length.toString()} sub="Registered curators" trendUp />
+        <StatsCard icon="group_add" label="Tổng khách hàng" value={(users ?? []).length.toString()} sub="Đã đăng ký" trendUp />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <Panel className="lg:col-span-2 p-6">
           <div className="flex justify-between items-start mb-6">
             <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">Revenue Snapshot</h3>
-              <p className="text-xs text-slate-400 mt-0.5">Performance of the last {orders.length} distributions</p>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">Biểu đồ doanh thu</h3>
+              <p className="text-xs text-slate-400 mt-0.5">Hiệu suất của {orders.length} đơn hàng gần nhất</p>
             </div>
-            <span className="text-xs font-bold bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 px-3 py-1.5 rounded-lg">+100% Data Sync</span>
+            <span className="text-xs font-bold bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 px-3 py-1.5 rounded-lg">+100% Đồng bộ</span>
           </div>
           <div className="flex items-end gap-2 h-40">
             {/* Simple mock chart using actual distribution of last 12 orders if available */}
@@ -114,24 +114,24 @@ export default function AdminDashboard() {
             })}
           </div>
           <div className="flex justify-between mt-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-            {['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9', 'P10', 'P11', 'Latest'].map((m) => (
+            {['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9', 'P10', 'P11', 'Mới nhất'].map((m) => (
               <span key={m}>{m}</span>
             ))}
           </div>
         </Panel>
 
         <Panel className="p-6">
-          <h3 className="text-base font-bold text-slate-900 dark:text-white mb-5">Recent Activity</h3>
+          <h3 className="text-base font-bold text-slate-900 dark:text-white mb-5">Hoạt động gần đây</h3>
           <div className="space-y-4">
             {recentOrders.length === 0 ? (
-              <p className="text-xs text-slate-400 italic">No recent activity recorded.</p>
+              <p className="text-xs text-slate-400 italic">Chưa có hoạt động nào.</p>
             ) : (
               recentOrders.map((o) => (
                 <ActivityItem 
                   key={o.orderId}
                   icon={o.status === 'CANCELLED' ? 'cancel' : 'package_2'} 
                   color={o.status === 'CANCELLED' ? 'bg-red-100 text-red-600 dark:bg-red-900/30' : 'bg-sky-100 text-sky-600 dark:bg-sky-900/30 dark:text-sky-400'} 
-                  title={`Order #${o.orderId}`} 
+                  title={`Đơn #${o.orderId}`} 
                   desc={`${o.orderItems[0]?.productName || 'Order'} · ${formatPrice(o.finalAmount)}`} 
                   time={formatDistanceToNow(new Date(o.createdAt), { addSuffix: true })} 
                 />
@@ -142,9 +142,9 @@ export default function AdminDashboard() {
                 key={u.userId}
                 icon="person_add" 
                 color="bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400" 
-                title="Customer Sync" 
-                desc={`Latest curator: ${u.fullName || u.username}`} 
-                time="Active" 
+                title="Đồng bộ KH" 
+                desc={`Khách hàng mới: ${u.fullName || u.username}`} 
+                time="Hoạt động" 
               />
             ))}
           </div>
@@ -153,10 +153,10 @@ export default function AdminDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Panel className="p-6">
-          <h3 className="text-base font-bold text-slate-900 dark:text-white mb-5">Top Performing Products</h3>
+          <h3 className="text-base font-bold text-slate-900 dark:text-white mb-5">Sản phẩm bán chạy</h3>
           <div className="space-y-4">
             {topProducts.length === 0 ? (
-              <p className="text-xs text-slate-400 italic">No sales data available yet.</p>
+              <p className="text-xs text-slate-400 italic">Chưa có dữ liệu bán hàng.</p>
             ) : (
               topProducts.map((p) => (
                 <div key={p.name} className="flex items-center gap-4">
@@ -176,12 +176,12 @@ export default function AdminDashboard() {
         </Panel>
 
         <Panel className="p-6">
-          <h3 className="text-base font-bold text-slate-900 dark:text-white mb-5">Quick Commands</h3>
+          <h3 className="text-base font-bold text-slate-900 dark:text-white mb-5">Truy cập nhanh</h3>
           <div className="grid grid-cols-2 gap-3">
-            <QuickActionLink icon="add_box" label="Add Product" href="/admin/products" color="bg-sky-50 text-sky-700 dark:bg-sky-900/20 dark:text-sky-400 hover:bg-sky-100" />
-            <QuickActionLink icon="receipt_long" label="Orders" href="/admin/orders" color="bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400 hover:bg-emerald-100" />
-            <QuickActionLink icon="analytics" label="Customers" href="/admin/customers" color="bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400 hover:bg-purple-100" />
-            <QuickActionLink icon="confirmation_number" label="Discounts" href="/admin/discounts" color="bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400 hover:bg-amber-100" />
+            <QuickActionLink icon="add_box" label="Thêm SP" href="/admin/products" color="bg-sky-50 text-sky-700 dark:bg-sky-900/20 dark:text-sky-400 hover:bg-sky-100" />
+            <QuickActionLink icon="receipt_long" label="Đơn hàng" href="/admin/orders" color="bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400 hover:bg-emerald-100" />
+            <QuickActionLink icon="analytics" label="Khách hàng" href="/admin/customers" color="bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400 hover:bg-purple-100" />
+            <QuickActionLink icon="confirmation_number" label="Giảm giá" href="/admin/discounts" color="bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400 hover:bg-amber-100" />
           </div>
         </Panel>
       </div>

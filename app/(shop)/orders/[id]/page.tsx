@@ -9,7 +9,7 @@ import { useOrder } from '@/hooks/useOrder';
 import { useReview } from '@/hooks/useReview';
 import { toast } from 'react-hot-toast';
 import dayjs from 'dayjs';
-import type { ReviewRequest, OrderItemReviewStatus } from '@/types/review';
+import type { ReviewRequest, OrderItemReviewStatus } from '@/schemas/review';
 import ImageUploader from '@/components/reviews/ImageUploader';
 
 export default function Pageordersdetail() {
@@ -83,12 +83,12 @@ export default function Pageordersdetail() {
     }
 
     if (result) {
-      toast.success(isEditMode ? 'Cap nhat danh gia thanh cong!' : 'Da gui danh gia! Cam on ban 🎉');
+      toast.success(isEditMode ? 'Cập nhật đánh giá thành công!' : 'Đã gửi đánh giá! Cảm ơn bạn 🎉');
       setModalOpen(false);
       // Refresh review status
       fetchOrderReviewStatus(orderId);
     } else {
-      toast.error('Loi khi gui danh gia');
+      toast.error('Lỗi khi gửi đánh giá');
     }
   }, [modalItem, currentOrder, modalRating, modalComment, modalImageUrls, modalImageFiles, isEditMode, createReview, updateReview, fetchOrderReviewStatus, orderId]);
 
@@ -108,11 +108,11 @@ export default function Pageordersdetail() {
         <div className="max-w-4xl mx-auto px-6 md:px-12 py-10">
           <Link href="/orders" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-sky-600 transition-all mb-6 group">
             <span className="material-symbols-outlined text-[18px] group-hover:-translate-x-1 transition-transform">arrow_back</span>
-            Back to Orders
+            Quay lại đơn hàng
           </Link>
           <div className="p-4 rounded-xl bg-red-50 text-red-600 text-sm font-medium border border-red-100 flex items-center gap-3">
             <span className="material-symbols-outlined">error</span>
-            {errorMsg || 'Order not found'}
+            {errorMsg || 'Không tìm thấy đơn hàng'}
           </div>
         </div>
       </AccountPageShell>
@@ -141,11 +141,11 @@ export default function Pageordersdetail() {
   const currentIndex = STATUS_STEPS.indexOf(status);
 
   const statusLabels: Record<string, string> = {
-    'PENDING': 'Pending Validation',
-    'CONFIRMED': 'Processing at Warehouse',
-    'SHIPPED': 'In Transit / Shipped',
-    'COMPLETED': 'Delivered Successfully',
-    'CANCELLED': 'Order Cancelled'
+    'PENDING': 'Chờ xác nhận',
+    'CONFIRMED': 'Đang xử lý tại kho',
+    'SHIPPED': 'Đang vận chuyển',
+    'COMPLETED': 'Giao hàng thành công',
+    'CANCELLED': 'Đã hủy đơn hàng'
   };
 
   const statusColors: Record<string, string> = {
@@ -182,27 +182,27 @@ export default function Pageordersdetail() {
                 {statusLabels[status] || status}
               </span>
             </div>
-            <p className="text-sm text-slate-500 font-medium">Placed on {dayjs(createdAt).format('MMM DD, YYYY hh:mm A')}</p>
+            <p className="text-sm text-slate-500 font-medium">Đặt ngày {dayjs(createdAt).format('DD/MM/YYYY HH:mm')}</p>
           </div>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 shadow-sm">
-              <h2 className="text-sm font-black uppercase tracking-widest text-slate-950 dark:text-white mb-8">Order Timeline</h2>
+              <h2 className="text-sm font-black uppercase tracking-widest text-slate-950 dark:text-white mb-8">Lịch trình đơn hàng</h2>
 
               {status === 'CANCELLED' ? (
                 <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-100 dark:border-red-900/30">
-                  <h3 className="text-sm font-bold text-red-600">This order was cancelled</h3>
-                  <p className="text-xs text-red-500 mt-1">If you have any questions, please contact our support team.</p>
+                  <h3 className="text-sm font-bold text-red-600">Đơn hàng này đã bị hủy</h3>
+                  <p className="text-xs text-red-500 mt-1">Nếu bạn có thắc mắc, vui lòng liên hệ đội ngũ hỗ trợ.</p>
                 </div>
               ) : (
                 <div className="relative pl-8 space-y-8">
                   <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-slate-100 dark:bg-slate-800 rounded-full" />
-                  <TimelineItem status="Pending Validation" desc="Order received and waiting for confirmation." date={dayjs(createdAt).format('MMM DD, hh:mm A')} current={status === 'PENDING'} completed={currentIndex > 0} />
-                  <TimelineItem status="Processing at Hub" desc="Order is being prepared for shipment." date={currentIndex >= 1 ? dayjs(createdAt).add(1, 'hour').format('MMM DD, hh:mm A') : '--'} current={status === 'CONFIRMED'} completed={currentIndex > 1} />
-                  <TimelineItem status="In Transit" desc="Handed over to the logistics partner." date={currentIndex >= 2 ? dayjs(createdAt).add(3, 'hour').format('MMM DD, hh:mm A') : '--'} current={status === 'SHIPPED'} completed={currentIndex > 2} />
-                  <TimelineItem status="Delivered" desc="Successfully delivered to your address." date={currentIndex >= 3 ? dayjs(createdAt).add(1, 'day').format('MMM DD, hh:mm A') : '--'} current={status === 'COMPLETED'} completed={status === 'COMPLETED'} />
+                  <TimelineItem status="Chờ xác nhận" desc="Đơn hàng đã nhận, đang chờ xác nhận." date={dayjs(createdAt).format('DD/MM HH:mm')} current={status === 'PENDING'} completed={currentIndex > 0} />
+                  <TimelineItem status="Đang xử lý" desc="Đơn hàng đang được chuẩn bị để giao." date={currentIndex >= 1 ? dayjs(createdAt).add(1, 'hour').format('DD/MM HH:mm') : '--'} current={status === 'CONFIRMED'} completed={currentIndex > 1} />
+                  <TimelineItem status="Đang vận chuyển" desc="Đã bàn giao cho đơn vị vận chuyển." date={currentIndex >= 2 ? dayjs(createdAt).add(3, 'hour').format('DD/MM HH:mm') : '--'} current={status === 'SHIPPED'} completed={currentIndex > 2} />
+                  <TimelineItem status="Đã giao hàng" desc="Giao hàng thành công đến địa chỉ của bạn." date={currentIndex >= 3 ? dayjs(createdAt).add(1, 'day').format('DD/MM HH:mm') : '--'} current={status === 'COMPLETED'} completed={status === 'COMPLETED'} />
                 </div>
               )}
             </div>
@@ -210,7 +210,7 @@ export default function Pageordersdetail() {
             {/* ── Order Items with Review Buttons ── */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
               <div className="px-6 py-4 border-b border-slate-50 dark:border-slate-800">
-                <h2 className="text-sm font-black uppercase tracking-widest text-slate-950 dark:text-white">Harvest Items ({orderItems.length})</h2>
+                <h2 className="text-sm font-black uppercase tracking-widest text-slate-950 dark:text-white">Sản phẩm đã đặt ({orderItems.length})</h2>
               </div>
               <div className="divide-y divide-slate-50 dark:divide-slate-800">
                 {orderItems.map((item) => {
@@ -225,12 +225,12 @@ export default function Pageordersdetail() {
                       <div className="flex-1 min-w-0">
                         <h3 className="text-sm font-black text-slate-900 dark:text-white truncate">{item.productName}</h3>
                         <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-widest">
-                          <span className="text-slate-400">Price:</span>
+                          <span className="text-slate-400">Giá:</span>
                           {item.originalPrice > item.price ? <span className="text-slate-400 line-through">{formatPrice(item.originalPrice)}</span> : null}
                           <span className="text-sky-500">{formatPrice(item.price)}</span>
                         </div>
                         <div className="mt-3 flex flex-wrap justify-between items-center gap-3">
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Qty: <span className="text-slate-900 dark:text-white">{item.quantity}</span></span>
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">SL: <span className="text-slate-900 dark:text-white">{item.quantity}</span></span>
                           <span className="text-sm font-black text-sky-600 italic">{formatPrice(item.subtotal)}</span>
                         </div>
 
@@ -256,7 +256,7 @@ export default function Pageordersdetail() {
                               className="inline-flex items-center gap-1.5 px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl border-2 border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all"
                             >
                               <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>edit</span>
-                              Edit Review
+                              Sửa đánh giá
                             </button>
                           ) : (
                             <button
@@ -271,7 +271,7 @@ export default function Pageordersdetail() {
                               className="inline-flex items-center gap-1.5 px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl bg-sky-600 text-white hover:bg-sky-700 shadow-lg shadow-sky-600/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
                             >
                               <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                              Write a Review
+                              Viết đánh giá
                             </button>
                           )}
                         </div>
@@ -287,31 +287,31 @@ export default function Pageordersdetail() {
           <div className="space-y-6">
             <div className="bg-slate-900 dark:bg-slate-900 rounded-2xl p-8 text-white shadow-xl relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-sky-600/20 rounded-full -mr-16 -mt-16 blur-3xl opacity-50" />
-              <h2 className="text-[10px] font-black uppercase tracking-widest mb-8 text-slate-500 italic">Bill of Lading</h2>
+              <h2 className="text-[10px] font-black uppercase tracking-widest mb-8 text-slate-500 italic">Hóa đơn</h2>
               <div className="space-y-4 mb-8">
                 <div className="flex justify-between items-center">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Subtotal</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Tạm tính</span>
                   <span className="text-sm font-bold">{formatPrice(totalAmount)}</span>
                 </div>
                 {discountAmount > 0 && (
                   <div className="flex justify-between items-center">
-                    <span className="text-[10px] uppercase font-bold text-sky-400 tracking-widest">Order discount</span>
+                    <span className="text-[10px] uppercase font-bold text-sky-400 tracking-widest">Giảm giá đơn hàng</span>
                     <span className="text-sm font-bold text-sky-400">-{formatPrice(discountAmount)}</span>
                   </div>
                 )}
                 <div className="flex justify-between items-center">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Shipping fee</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Phí vận chuyển</span>
                   <span className="text-sm font-bold">{formatPrice(shippingFee)}</span>
                 </div>
                 {shippingDiscount > 0 && (
                   <div className="flex justify-between items-center">
-                    <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-widest">Shipping discount</span>
+                    <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-widest">Giảm phí ship</span>
                     <span className="text-sm font-bold text-emerald-400">-{formatPrice(shippingDiscount)}</span>
                   </div>
                 )}
                 {appliedCodes.length > 0 && (
                   <div className="pt-2">
-                    <span className="text-[10px] uppercase font-bold text-slate-500 tracking-widest block mb-2">Applied codes</span>
+                    <span className="text-[10px] uppercase font-bold text-slate-500 tracking-widest block mb-2">Mã đã áp dụng</span>
                     <div className="flex flex-wrap gap-2">
                       {appliedCodes.map((code) => (
                         <span key={code} className="px-2.5 py-1 rounded-lg bg-slate-800 text-[10px] font-black uppercase tracking-widest text-sky-300 border border-slate-700">
@@ -323,19 +323,19 @@ export default function Pageordersdetail() {
                 )}
                 {totalSavings > 0 && (
                   <div className="flex justify-between items-center">
-                    <span className="text-[10px] uppercase font-bold text-slate-500 tracking-widest">Original total</span>
+                    <span className="text-[10px] uppercase font-bold text-slate-500 tracking-widest">Tổng gốc</span>
                     <span className="text-sm font-bold text-slate-400 line-through">{formatPrice(originalTotal)}</span>
                   </div>
                 )}
                 {totalSavings > 0 && (
                   <div className="flex justify-between items-center">
-                    <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-widest">Total saved</span>
+                    <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-widest">Đã tiết kiệm</span>
                     <span className="text-sm font-bold text-emerald-400">{formatPrice(totalSavings)}</span>
                   </div>
                 )}
               </div>
               <div className="pt-6 border-t border-white/10 flex flex-col">
-                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Total Settled</span>
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Tổng thanh toán</span>
                 <span className="text-3xl font-black tracking-tighter text-sky-400 italic">{formatPrice(finalAmount)}</span>
               </div>
             </div>
@@ -343,14 +343,14 @@ export default function Pageordersdetail() {
             <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
               <div className="flex items-center gap-3 mb-4">
                 <span className="material-symbols-outlined text-sky-600 text-[18px]">location_on</span>
-                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Port of Delivery</h3>
+                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Địa chỉ giao hàng</h3>
               </div>
               <p className="text-xs text-slate-500 font-medium leading-relaxed">
                 {shippingAddress}
               </p>
               {shippingNote && (
                 <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Note</span>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Ghi chú</span>
                   <p className="text-xs text-slate-600 dark:text-slate-400 italic">&quot;{shippingNote}&quot;</p>
                 </div>
               )}
@@ -359,11 +359,11 @@ export default function Pageordersdetail() {
             <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
               <div className="flex items-center gap-3 mb-4">
                 <span className="material-symbols-outlined text-sky-600 text-[18px]">payments</span>
-                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Settlement</h3>
+                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Thanh toán</h3>
               </div>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-6 bg-slate-100 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700 flex items-center justify-center font-black italic text-[8px] text-slate-900 dark:text-white">COD</div>
-                <p className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-widest">Cash on Delivery</p>
+                <p className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-widest">Thanh toán khi nhận hàng</p>
               </div>
             </div>
           </div>
@@ -388,7 +388,7 @@ export default function Pageordersdetail() {
                     </div>
                   )}
                   <div>
-                    <h3 className="text-lg font-black text-slate-900 dark:text-white">{isEditMode ? 'Edit Your Review' : 'Write a Review'}</h3>
+                    <h3 className="text-lg font-black text-slate-900 dark:text-white">{isEditMode ? 'Chỉnh sửa đánh giá' : 'Viết đánh giá'}</h3>
                     <p className="text-xs text-slate-500 font-medium mt-0.5 truncate max-w-[250px]">{modalItem.productName}</p>
                   </div>
                 </div>
@@ -400,7 +400,7 @@ export default function Pageordersdetail() {
 
             {/* Stars */}
             <div className="px-8 py-4">
-              <p className="text-xs font-black uppercase tracking-widest text-slate-500 mb-3">Your Rating</p>
+              <p className="text-xs font-black uppercase tracking-widest text-slate-500 mb-3">Đánh giá của bạn</p>
               <div className="flex items-center gap-1">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
@@ -425,18 +425,18 @@ export default function Pageordersdetail() {
                   </button>
                 ))}
                 <span className="ml-3 text-sm font-black text-slate-900 dark:text-white">
-                  {['', 'Terrible', 'Poor', 'Average', 'Good', 'Excellent'][modalRating]}
+                  {['', 'Rất tệ', 'Tệ', 'Bình thường', 'Tốt', 'Tuyệt vời'][modalRating]}
                 </span>
               </div>
             </div>
 
             {/* Comment */}
             <div className="px-8 py-2">
-              <p className="text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Your Comment</p>
+              <p className="text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Nhận xét</p>
               <textarea
                 value={modalComment}
                 onChange={(e) => setModalComment(e.target.value)}
-                placeholder="Share your experience with this product..."
+                placeholder="Chia sẻ trải nghiệm của bạn với sản phẩm này..."
                 rows={3}
                 maxLength={2000}
                 className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition-all resize-none mb-1"
@@ -444,7 +444,7 @@ export default function Pageordersdetail() {
               <p className="text-right text-[10px] text-slate-400 font-bold mb-4">{modalComment.length}/2000</p>
               
               {/* Image Uploader */}
-              <p className="text-xs font-black uppercase tracking-widest text-slate-500 mb-2 mt-2">Attach Photos</p>
+              <p className="text-xs font-black uppercase tracking-widest text-slate-500 mb-2 mt-2">Đính kèm ảnh</p>
               <ImageUploader 
                 imageFiles={modalImageFiles}
                 imageUrls={modalImageUrls}
@@ -461,7 +461,7 @@ export default function Pageordersdetail() {
                 onClick={() => setModalOpen(false)}
                 className="flex-1 py-3 rounded-xl text-sm font-bold border-2 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
               >
-                Cancel
+                Hủy
               </button>
               <button
                 onClick={handleSubmitReview}
@@ -471,12 +471,12 @@ export default function Pageordersdetail() {
                 {isSubmitting ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                    Submitting...
+                    Đang gửi...
                   </>
                 ) : (
                   <>
                     <span className="material-symbols-outlined text-[16px]">send</span>
-                    {isEditMode ? 'Update Review' : 'Submit Review'}
+                    {isEditMode ? 'Cập nhật' : 'Gửi đánh giá'}
                   </>
                 )}
               </button>

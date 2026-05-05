@@ -1,5 +1,6 @@
-import type { ProductRequest, ProductResponse, ApiResponse, PageResponse, BulkAssignDiscountRequest } from '@/types/product';
-import type { AdminProductQuery, ProductQuery } from '@/types/query';
+import type { ProductRequest, ProductResponse, BulkAssignDiscountRequest } from '@/schemas/product';
+import type { ApiResponse, PageResponse } from '@/schemas/api';
+import type { AdminProductQuery, ProductQuery } from '@/schemas/query';
 import { fetcher } from '@/lib/fetcher';
 
 type ProductQueryInput = ProductQuery & Partial<Pick<AdminProductQuery, 'status' | 'isActive'>>;
@@ -38,7 +39,7 @@ const buildProductFormData = (request: ProductRequest): FormData => {
   }
 
   if (request.imageFiles) {
-    request.imageFiles.forEach((file) => {
+    request.imageFiles.forEach((file: File) => {
       formData.append('imageFiles', file);
     });
   }

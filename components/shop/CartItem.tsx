@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { formatPrice } from '@/lib/utils';
-import { ProductResponse } from '@/types/product';
+import { ProductResponse } from '@/schemas/product';
 
 interface CartItemProps {
   item: {

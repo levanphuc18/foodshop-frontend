@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { getAllActiveDiscounts } from '@/lib/api/discount';
-import type { DiscountResponse } from '@/types/discount';
+import type { DiscountResponse } from '@/schemas/discount';
 import { formatPrice } from '@/lib/utils';
 
 interface VoucherModalProps {
@@ -50,8 +50,8 @@ export default function VoucherModal({
       <div className="flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900">
         <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-6 py-5 dark:border-slate-800 dark:bg-slate-900/50">
           <div>
-            <h2 className="text-lg font-black tracking-tight text-slate-900 dark:text-white">Voucher Library</h2>
-            <p className="text-[11px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Pick ORDER or SHIPPING discounts</p>
+            <h2 className="text-lg font-black tracking-tight text-slate-900 dark:text-white">Kho mã giảm giá</h2>
+            <p className="text-[11px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Chọn mã ĐƠN HÀNG hoặc VẬN CHUYỂN</p>
           </div>
           <button
             type="button"
@@ -74,7 +74,7 @@ export default function VoucherModal({
                   : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
               }`}
             >
-              {tab === 'ORDER' ? 'Order vouchers' : 'Shipping vouchers'}
+              {tab === 'ORDER' ? 'Mã đơn hàng' : 'Mã vận chuyển'}
             </button>
           ))}
         </div>
@@ -83,10 +83,10 @@ export default function VoucherModal({
           {isLoading ? (
             <div className="flex flex-col items-center justify-center gap-3 py-10">
               <span className="material-symbols-outlined animate-spin text-3xl text-sky-500">refresh</span>
-              <p className="text-xs font-black text-slate-500 dark:text-slate-400">Loading vouchers...</p>
+              <p className="text-xs font-black text-slate-500 dark:text-slate-400">Đang tải mã giảm giá...</p>
             </div>
           ) : displayVouchers.length === 0 ? (
-            <div className="py-12 text-center text-sm font-bold text-slate-500">No vouchers available in this section.</div>
+            <div className="py-12 text-center text-sm font-bold text-slate-500">Không có mã giảm giá trong mục này.</div>
           ) : (
             <div className="space-y-4">
               {displayVouchers.map((voucher) => {
@@ -110,20 +110,20 @@ export default function VoucherModal({
                           </span>
                           {isApplied && (
                             <span className="rounded border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-600 dark:border-emerald-900/30 dark:bg-emerald-900/20 dark:text-emerald-400">
-                              Applied
+                              Đã áp dụng
                             </span>
                           )}
                         </div>
                         <h3 className="text-base font-black text-slate-900 dark:text-white">
                           {voucher.discountUnit === 'PERCENT'
-                            ? `${voucher.value}% ${voucher.type === 'SHIPPING' ? 'shipping off' : 'off your order'}`
-                            : `${formatPrice(voucher.value)} ${voucher.type === 'SHIPPING' ? 'shipping off' : 'off your order'}`}
+                            ? `${voucher.value}% ${voucher.type === 'SHIPPING' ? 'giảm phí ship' : 'giảm đơn hàng'}`
+                            : `${formatPrice(voucher.value)} ${voucher.type === 'SHIPPING' ? 'giảm phí ship' : 'giảm đơn hàng'}`}
                         </h3>
                         <div className="space-y-1 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-                          {voucher.minOrderAmount ? <p>Minimum order: {formatPrice(voucher.minOrderAmount)}</p> : null}
-                          {voucher.maxDiscount && voucher.discountUnit === 'PERCENT' ? <p>Cap: {formatPrice(voucher.maxDiscount)}</p> : null}
-                          {voucher.usageLimit ? <p>Usage: {voucher.usedCount}/{voucher.usageLimit}</p> : null}
-                          {voucher.perUserLimit ? <p>Per-user limit: {voucher.perUserLimit}</p> : null}
+                          {voucher.minOrderAmount ? <p>Đơn tối thiểu: {formatPrice(voucher.minOrderAmount)}</p> : null}
+                          {voucher.maxDiscount && voucher.discountUnit === 'PERCENT' ? <p>Giảm tối đa: {formatPrice(voucher.maxDiscount)}</p> : null}
+                          {voucher.usageLimit ? <p>Sử dụng: {voucher.usedCount}/{voucher.usageLimit}</p> : null}
+                          {voucher.perUserLimit ? <p>Giới hạn/người: {voucher.perUserLimit}</p> : null}
                         </div>
                       </div>
 
@@ -136,7 +136,7 @@ export default function VoucherModal({
                         }}
                         className="rounded-xl bg-sky-600 px-4 py-2 text-xs font-black uppercase tracking-widest text-white transition-all hover:bg-sky-700 disabled:cursor-not-allowed disabled:bg-slate-300"
                       >
-                        {isApplied ? 'Replace' : 'Use'}
+                        {isApplied ? 'Thay thế' : 'Dùng'}
                       </button>
                     </div>
                   </div>
