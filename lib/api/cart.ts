@@ -1,5 +1,5 @@
-import { CartItemRequest, CartItemResponse } from '@/types/cart';
-import { ApiResponse } from '@/types/product';
+import { CartItemRequest, CartItemResponse } from '@/schemas/cart';
+import { ApiResponse } from '@/schemas/api';
 import { fetcher } from '@/lib/fetcher';
 
 export const addToCart = async (request: CartItemRequest): Promise<ApiResponse<CartItemResponse>> => {

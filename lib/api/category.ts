@@ -1,5 +1,5 @@
-import { CategoryResponse } from '@/types/category';
-import { ApiResponse } from '@/types/product';
+import { CategoryResponse } from '@/schemas/category';
+import { ApiResponse } from '@/schemas/api';
 import { fetcher } from '@/lib/fetcher';
 
 export const getAllCategories = async (): Promise<ApiResponse<CategoryResponse[]>> => {

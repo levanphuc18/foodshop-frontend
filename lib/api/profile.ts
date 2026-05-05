@@ -1,6 +1,6 @@
 import { fetcher } from '@/lib/fetcher';
-import type { ApiResponse } from '@/types/api';
-import type { UserResponse } from '@/types/user';
+import type { ApiResponse } from '@/schemas/api';
+import type { UserResponse } from '@/schemas/user';
 
 export interface UpdateProfilePayload {
   email: string;

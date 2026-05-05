@@ -1,6 +1,6 @@
 import { fetcher } from '@/lib/fetcher';
-import type { ApiResponse } from '@/types/api';
-import type { NotificationItem } from '@/types/notification';
+import type { ApiResponse } from '@/schemas/api';
+import type { NotificationItem } from '@/schemas/notification';
 
 export function getNotifications() {
   return fetcher<ApiResponse<NotificationItem[]>>('/notifications');

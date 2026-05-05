@@ -1,6 +1,6 @@
 import { API_BASE_URL } from '@/lib/constants';
-import type { AuthRequest, RegisterRequest, AuthResponse, JwtResponse } from '@/types/auth';
-import type { ApiResponse } from '@/types/api';
+import type { AuthRequest, RegisterRequest, AuthResponse, JwtResponse } from '@/schemas/auth';
+import type { ApiResponse } from '@/schemas/api';
 
 /**
  * Tiện ích đơn giản để lưu token vào cookies ở phía client.
@@ -22,7 +22,7 @@ export const clearAuthCookies = async () => {
   if (typeof window !== 'undefined') {
     try {
       await fetch('/api/auth/cookies', { method: 'DELETE' });
-    } catch (e) {
+    } catch {
       console.warn('Failed to clear HttpOnly cookies via API');
     }
     // Dọn dẹp cả token cũ còn sót lại (legacy non-HttpOnly)

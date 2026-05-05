@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '@/lib/constants';
-import { getAuthHeaders, refreshToken } from '@/lib/api/auth';
+import { getAuthHeaders } from '@/lib/api/auth';
 import { useAuthStore } from '@/store/authStore';
 
 /**
